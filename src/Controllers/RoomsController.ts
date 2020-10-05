@@ -1,7 +1,6 @@
 import express from "express";
 import {Controller} from "../Common/Controller";
 import {Sequelize} from "sequelize-typescript";
-import RoomsTableModel from "../Models/Database/RoomsTableModel";
 import {validate} from "express-jsonschema";
 
 
@@ -57,7 +56,6 @@ class RoomsController implements Controller
             });
     }
 
-    // tslint:disable-next-line:no-empty
     private async getRoom(req: express.Request, res: express.Response) {
         await this.db.models.RoomsTableModel.findByPk(req.params.id)
             .then(r => {
@@ -73,7 +71,6 @@ class RoomsController implements Controller
             });
     }
 
-    // tslint:disable-next-line:no-empty
     private async updateRoom(req: express.Request, res: express.Response) {
         await this.db.models.RoomsTableModel.findByPk(req.params.id)
             .then(async r => {
@@ -87,8 +84,8 @@ class RoomsController implements Controller
                             RoomsID: req.params.id
                         }
                     })
-                        .then(r2 => {
-                            res.send({status: "successful"});
+                        .then(updateResult => {
+                            res.send(updateResult);
                         })
                         .catch(e => {
                            res.status(500).send("error");
