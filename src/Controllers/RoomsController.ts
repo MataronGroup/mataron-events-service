@@ -16,13 +16,9 @@ class RoomsController implements Controller
         this.db = db;
         this.path = "/rooms";
         this.router = express.Router();
-        this.schema = this.initializeSchema();
+        this.schema = schemas.basicBody;
 
         this.initializeRoutes();
-    }
-
-    private initializeSchema() {
-        return (schemas.basicBody);
     }
 
     private initializeRoutes() {
@@ -42,7 +38,7 @@ class RoomsController implements Controller
                 res.send(r);
             })
             .catch(e => {
-                res.status(500).send(e.original.message);
+                res.status(500).send(new ErrorResponse(e.original.message));
             });
     }
 
