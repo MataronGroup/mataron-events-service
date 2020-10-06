@@ -1,0 +1,12 @@
+{
+  "dbconnection": {
+    "database": "mataron",
+    "username": "mataron",
+    "password": "thelittlecitizen",
+    "host": "10.1.0.117",
+    "dialect": "mssql"
+  },
+  "server": {
+    "port": 5000
+  }
+}

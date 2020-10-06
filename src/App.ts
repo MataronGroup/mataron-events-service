@@ -23,7 +23,6 @@ class App {
 
     private initializeMiddlewaresAfterControllers() {
         this.app.use(this.jsonSchemaValidationError);
-
     }
 
     private jsonSchemaValidationError(err: any, req: any, res: any, next: any) {

@@ -2,6 +2,8 @@ import express from "express";
 import {Controller} from "../Common/Controller";
 import {Sequelize} from "sequelize-typescript";
 import {validate} from "express-jsonschema";
+import schemas from "../Configuration/JsonSchemas/RoomsControllerSchemas";
+import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
 
 
 class RoomsController implements Controller
@@ -20,25 +22,13 @@ class RoomsController implements Controller
     }
 
     private initializeSchema() {
-        return ({
-            type: 'object',
-            properties: {
-                Name: {
-                    type: 'string',
-                    required: true
-                },
-                Base: {
-                    type: 'number',
-                    required: true
-                }
-            }
-        });
+        return (schemas.basicBody);
     }
 
     private initializeRoutes() {
         this.router.post(this.path, validate({body: this.schema}), this.createRoom.bind(this));
         this.router.get(`${this.path}/:id`, this.getRoom.bind(this));
-        this.router.put(`${this.path}/:id`, this.updateRoom.bind(this));
+        this.router.put(`${this.path}/:id`,validate({body: this.schema}), this.updateRoom.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteRoom.bind(this));
     }
 
@@ -63,11 +53,11 @@ class RoomsController implements Controller
                    res.send(r);
                }
                else {
-                   res.status(404).send(`cannot find room id ${req.params.id}`)
+                   res.status(404).send(new ErrorResponse(`cannot find room id ${req.params.id}`))
                }
             })
             .catch(e => {
-                res.status(500).send(e.original.message);
+                res.status(500).send(new ErrorResponse(e.original.message));
             });
     }
 
@@ -88,11 +78,11 @@ class RoomsController implements Controller
                             res.send(updateResult);
                         })
                         .catch(e => {
-                           res.status(500).send("error");
+                           res.status(500).send(new ErrorResponse(e.original.message));
                         });
                 }
                 else {
-                    res.status(404).send(`cannot find room id ${req.params.id}`)
+                    res.status(404).send(new ErrorResponse(`cannot find room id ${req.params.id}`));
                 }
             })
     }
@@ -109,11 +99,11 @@ class RoomsController implements Controller
                     res.send({status: "successful"});
                 }
                 else {
-                    res.status(404).send(`cannot find room id ${req.params.id}`)
+                    res.status(404).send(new ErrorResponse(`cannot find room id ${req.params.id}`));
                 }
             })
             .catch(e => {
-                res.status(500).send("error");
+                res.status(500).send(new ErrorResponse("error"));
             });
     }
 }

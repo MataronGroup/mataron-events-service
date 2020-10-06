@@ -14,7 +14,6 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-jsonschema": "^1.1.6",
-    "nodemon": "^2.0.4",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.22.3",
     "sequelize-typescript": "^1.1.0",
