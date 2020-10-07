@@ -63,7 +63,7 @@ class RoomsController implements Controller
 
     private async updateRoom(req: express.Request, res: express.Response) {
         await this.db.models.RoomsTableModel.findByPk(req.params.id)
-            .then(async r => {
+            .then( r => {
                 if(r)
                 {
                     r.update({
