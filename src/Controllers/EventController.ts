@@ -72,11 +72,23 @@ class EventController implements Controller {
     private initializeRoutes() {
         this.router.post(this.path,  this.createEvent.bind(this));
         this.router.get(`${this.path}/:id`, this.getEvent.bind(this));
+        this.router.get(`${this.path}`, this.getAllEvents.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteEvent.bind(this));
         this.router.put(`${this.path}/:id`, this.updateEvent.bind(this));
 
     }
-
+    private async getAllEvents(req: express.Request, res: express.Response) {
+        await this.db.models.EventsModel.create({
+            ArenaID: req.body.ArenaId,
+            Name: req.body.Name,
+        })
+            .then(r => {
+                res.send(r);
+            })
+            .catch(e => {
+                res.send(new ErrorResponse(e));
+            })
+    }
     private async createEvent(req: express.Request, res: express.Response) {
         await this.db.models.EventsModel.create({
             ArenaID: req.body.ArenaId,
