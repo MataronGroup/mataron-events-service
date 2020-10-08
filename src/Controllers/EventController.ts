@@ -207,7 +207,7 @@ class EventController implements Controller {
     //                         await this.db.models.RoomsTableModel.update({
     //                             Name: req.body.bases[i].room[k].Name,
     //                             BaseID: req.body.bases[i].BaseId
-    //                         }, {where:{EventID: req.body.bases[i].}})
+    //                         }, {where:{EventID: req.body.}})
 
 
     //                         for( let m =0; i<req.body.bases[i].room[k].stands.length; m ++)
