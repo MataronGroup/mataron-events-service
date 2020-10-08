@@ -4,6 +4,7 @@ import {Sequelize} from "sequelize-typescript";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
 import schemas from "../Configuration/JsonSchemas/BaseControllerSchemas";
 import {validate} from "express-jsonschema";
+import BaseTableController from "../Models/Database/BaseTableController";
 
 class BaseController implements Controller {
     path: string;
@@ -23,6 +24,8 @@ class BaseController implements Controller {
     private initializeRoutes() {
         this.router.post(`${this.path}`, validate({body: this.schema}), this.createBase.bind(this));
         this.router.get(`${this.path}/:id`, this.getBase.bind(this));
+        this.router.get(`${this.path}/getAllBasesByEvent/:id`, this.getAllBasesByEvent.bind(this));
+        this.router.get(`${this.path}/getRoomsByBase/:id`, this.getAllRoomsByBase.bind(this));
         this.router.get(`${this.path}/arena/:id`, this.getBaseByArena.bind(this));
         this.router.put(`${this.path}/:id`, this.updateBase.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteBase.bind(this));
@@ -56,9 +59,42 @@ class BaseController implements Controller {
     }
 
     private async getBaseByArena(req: express.Request, res: express.Response) {
+
         await this.db.models.BaseTableController.findAll({
             where: {
                 ArenaID: req.params.id
+            }
+        })
+            .then(r => {
+                res.send(r);
+            })
+            .catch(e => {
+                res.status(500).send(new ErrorResponse(e));
+            })
+    }
+
+    private async getAllBasesByEvent(req: express.Request, res: express.Response) {
+        await this.db.models.RoomsTableModel.findAll({
+            nest : true,
+            include:[{
+                model : BaseTableController,
+                required : true
+            }],
+            where: {
+                EventID: req.params.id
+            }
+        })
+            .then(r => {
+                res.send(r);
+            })
+            .catch(e => {
+                res.status(500).send(new ErrorResponse(e));
+            })
+    }
+    private async getAllRoomsByBase(req: express.Request, res: express.Response) {
+        await this.db.models.RoomsTableModel.findAll({
+            where: {
+                BaseID: req.params.id
             }
         })
             .then(r => {
