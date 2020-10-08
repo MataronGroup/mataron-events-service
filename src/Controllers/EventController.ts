@@ -72,7 +72,7 @@ class EventController implements Controller {
     private initializeRoutes() {
         this.router.post(this.path,  this.createEvent.bind(this));
         this.router.get(`${this.path}/:id`, this.getEvent.bind(this));
-        this.router.get(`${this.path}/:`, this.getEvents.bind(this));
+        this.router.get(`${this.path}`, this.getEvents.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteEvent.bind(this));
         // this.router.put(`${this.path}/:id`, this.updateEvent.bind(this));
 
@@ -147,15 +147,15 @@ class EventController implements Controller {
         await this.db.models.EventsModel.findAll()
             .then(r => {
                   res.send(r);
-               
-             
+
+
             })
             .catch(e => {
                 res.status(500).send(new ErrorResponse(e.original.message));
             });
     }
 
-    
+
 
     private async deleteEvent(req: express.Request, res: express.Response) {
         console.log(this.db.models)
