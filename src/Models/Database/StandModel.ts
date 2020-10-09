@@ -15,16 +15,16 @@ class StandModel extends Model<StandModel>
     RoomsID: number;
 
     @Column
-    X: number;
+    X: string;
 
     @Column
-    Y:number;
+    Y:string;
 
     @Column
-    DayUserID:number;
+    DayUserID:string;
 
     @Column
-    NightUsrID:number;
+    NightUserID:string;
 
 
 

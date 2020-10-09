@@ -13,6 +13,9 @@ class RoomsTableModel extends Model<RoomsTableModel>
 
     @Column
     BaseID: number;
+
+    @Column
+    EventID: number;
 }
 
 export default RoomsTableModel;
