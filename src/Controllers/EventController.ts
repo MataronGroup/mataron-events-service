@@ -211,26 +211,26 @@ class EventController implements Controller {
     //         {
     //             for (let i = 0; i < req.body.bases.length; i++) {
     //                 console.log(i)
-        
+
     //                 for (let k = 0; k < req.body.bases[i].room.length; k++) {
     //                     console.log(k);
-        
+
     //                     const room : any = await this.db.models.RoomsTableModel.update({
     //                         Name: req.body.bases[i].room[k].Name,
     //                         BaseID: req.body.bases[i].BaseId}, {where:{EventID: req.params.id}})
-                       
+
     //                     .then(r => r.toJSON());
 
-                        
-        
+
+
     //                     for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
     //                         console.log(m)
-        
-                            
+
+
     //                         for (let n = 0; n < req.body.bases[i].room[k].stands[m].soldiers.length; n++) {
     //                             console.log(n)
-        
-        
+
+
     //                             const stand = await this.db.models.StandModel.create({
     //                                 DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
     //                                 NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
@@ -238,16 +238,16 @@ class EventController implements Controller {
     //                                 X: req.body.bases[i].room[k].stands[m].x,
     //                                 Y: req.body.bases[i].room[k].stands[m].y,
     //                                 CellName: req.body.bases[i].room[k].stands[m].cellname
-        
+
     //                             })
-        
+
     //                                 .then(r => {
     //                                     res.send(r);
     //                                 })
     //                                 .catch(e => {
     //                                     res.status(500).send(e.original.message);
     //                                 });
-        
+
     //                         }
     //                     }
     //                 }
