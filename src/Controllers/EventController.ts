@@ -106,15 +106,7 @@ class EventController implements Controller {
                 for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
                     console.log(m)
 
-                    // const standModel = await this.db.models.StandModel.create({
-                    //     RoomsID: room.RoomsID,
-                    //     X: req.body.bases[i].room[k].stands[m].x,
-                    //     Y: req.body.bases[i].room[k].stands[m].y
-
-
-                    // })
-
-
+                    /////////// ForOf as need, I did not use it////////////
                     // for(let soldier of req.body.bases[i].room[k].stands[m].soldiers){
                     //     await this.db.models.StandModel.create({
                     //         DayUserID: soldier,
@@ -138,18 +130,17 @@ class EventController implements Controller {
                             NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
                             RoomsID: room.RoomsID,
                             X: req.body.bases[i].room[k].stands[m].x,
-                            Y: req.body.bases[i].room[k].stands[m].y
+                            Y: req.body.bases[i].room[k].stands[m].y,
+                            CellName: req.body.bases[i].room[k].stands[m].cellname
 
                         })
-                        // console.log('stand:')
-                        // console.log(stand)
 
-                            // .then(r => {
-                            //     res.send(r);
-                            // })
-                            // .catch(e => {
-                            //     res.status(500).send(e.original.message);
-                            // });
+                            .then(r => {
+                                res.send(r);
+                            })
+                            .catch(e => {
+                                res.status(500).send(e.original.message);
+                            });
 
                     }
                 }
@@ -172,6 +163,7 @@ class EventController implements Controller {
                 res.status(500).send(new ErrorResponse(e.original.message));
             });
     }
+
 
     private async getEvents(req: express.Request, res: express.Response) {
         await this.db.models.EventsModel.findAll()
@@ -214,45 +206,57 @@ class EventController implements Controller {
     //     console.log(this.db.models)
 
     //     await this.db.models.EventsModel.findByPk(req.params.id)
+    //     .then( r => {
+    //         if(r)
+    //         {
+    //             for (let i = 0; i < req.body.bases.length; i++) {
+    //                 console.log(i)
+        
+    //                 for (let k = 0; k < req.body.bases[i].room.length; k++) {
+    //                     console.log(k);
+        
+    //                     const room : any = await this.db.models.RoomsTableModel.update({
+    //                         Name: req.body.bases[i].room[k].Name,
+    //                         BaseID: req.body.bases[i].BaseId}, {where:{EventID: req.params.id}})
+                       
+    //                     .then(r => r.toJSON());
 
-    //         .then(async r => {
-    //             if(r)
-    //             {
-    //                 for( let i =0; i< req.body.bases.length; i++)
-    //                 {
-    //                     for(let k = 0; i<req.body.bases[i].room.length; k++)
-    //                     {const a = (onselect RoomID; from RoomsTableModel)
-    //                         await this.db.models.RoomsTableModel.update({
-    //                             Name: req.body.bases[i].room[k].Name,
-    //                             BaseID: req.body.bases[i].BaseId
-    //                         }, {where:{RoomID: })
-
-
-    //                         for( let m =0; i<req.body.bases[i].room[k].stands.length; m ++)
-    //                         {
-    //                             await this.db.models.StandModel.update({
-    //                                 RoomID: req.body.bases[i].room[k].stands[m].RoomsTableModel,
+                        
+        
+    //                     for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
+    //                         console.log(m)
+        
+                            
+    //                         for (let n = 0; n < req.body.bases[i].room[k].stands[m].soldiers.length; n++) {
+    //                             console.log(n)
+        
+        
+    //                             const stand = await this.db.models.StandModel.create({
+    //                                 DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
+    //                                 NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
+    //                                 RoomsID: room.RoomsID,
     //                                 X: req.body.bases[i].room[k].stands[m].x,
-    //                                 Y:req.body.bases[i].room[k].stands[m].y}, {where:{EventID: req.params.id}})
-
-
-    //                             for(let n = 0; i<req.body.bases[i].room[k].stands[m].soldiers.length; n ++ )
-    //                             {
-    //                                 await this.db.models.StandModel.update({
-    //                                     DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n],
-    //                                     NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n]}, {where:{EventID: req.params.id}})
-
-    //                             }
-
+    //                                 Y: req.body.bases[i].room[k].stands[m].y,
+    //                                 CellName: req.body.bases[i].room[k].stands[m].cellname
+        
+    //                             })
+        
+    //                                 .then(r => {
+    //                                     res.send(r);
+    //                                 })
+    //                                 .catch(e => {
+    //                                     res.status(500).send(e.original.message);
+    //                                 });
+        
     //                         }
-
     //                     }
-
-
     //                 }
-    //             }
+    //         else {
+    //             res.status(404).send(new ErrorResponse(`cannot find room id ${req.params.id}`));
+    //         }
+    //     })
 
-    //         })
+
 
     // }
 
