@@ -1,5 +1,7 @@
 import App from "./App";
 import RoomsController from "./Controllers/RoomsController";
+import EventController from "./Controllers/EventController";
+
 import DBConnection from "./Common/DBConnection";
 import {server} from "./Configuration/AppConfiguration.json";
 import ArenaController from "./Controllers/ArenaController";
@@ -11,11 +13,12 @@ import ProfessionsController from "./Controllers/ProfessionsController";
 const db = DBConnection;
 const app = new App(
     [
-        new RoomsController(db),
         new ArenaController(db),
         new BaseController(db),
         new JobsController(db),
-        new ProfessionsController(db)
+        new ProfessionsController(db),
+        new RoomsController(db),
+        new EventController(db),
     ],
     server.port,
 );

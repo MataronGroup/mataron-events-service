@@ -24,6 +24,7 @@ class RoomsController implements Controller
     private initializeRoutes() {
         this.router.post(this.path, validate({body: this.schema}), this.createRoom.bind(this));
         this.router.get(`${this.path}/:id`, this.getRoom.bind(this));
+        this.router.get(`${this.path}/event/:id`, this.getRoomByEvent.bind(this));
         this.router.put(`${this.path}/:id`,validate({body: this.schema}), this.updateRoom.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteRoom.bind(this));
     }
@@ -57,9 +58,24 @@ class RoomsController implements Controller
             });
     }
 
+    private async getRoomByEvent(req: express.Request, res: express.Response) {
+        await this.db.models.RoomsTableModel.findAll({where: {EventID: req.params.id}})
+            .then(r => {
+                if(r) {
+                    res.send(r);
+                }
+                else {
+                    res.status(404).send(new ErrorResponse(`cannot find event id ${req.params.id}`))
+                }
+            })
+            .catch(e => {
+                res.status(500).send(new ErrorResponse(e.original.message));
+            });
+    }
+
     private async updateRoom(req: express.Request, res: express.Response) {
         await this.db.models.RoomsTableModel.findByPk(req.params.id)
-            .then(async r => {
+            .then( r => {
                 if(r)
                 {
                     r.update({
