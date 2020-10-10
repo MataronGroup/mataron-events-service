@@ -6,7 +6,11 @@ const schemas = {
                 type: 'string',
                 required: true
             },
-            Base: {
+            BaseID: {
+                type: 'number',
+                required: true
+            },
+            EventID: {
                 type: 'number',
                 required: true
             }
