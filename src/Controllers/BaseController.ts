@@ -29,7 +29,7 @@ class BaseController implements Controller {
     }
 
     private async createBase(req: express.Request, res: express.Response) {
-        await this.db.models.BaseTableController.create({
+        await this.db.models.BaseModel.create({
             Name: req.body.Name,
             ArenaID: req.body.ArenaID
         })
@@ -42,7 +42,7 @@ class BaseController implements Controller {
     }
 
     private async getBase(req: express.Request, res: express.Response) {
-        await this.db.models.BaseTableController.findByPk(req.params.id)
+        await this.db.models.BaseModel.findByPk(req.params.id)
             .then(r => {
                 if (r) {
                     res.send(r);
@@ -56,7 +56,7 @@ class BaseController implements Controller {
     }
 
     private async getBaseByArena(req: express.Request, res: express.Response) {
-        await this.db.models.BaseTableController.findAll({
+        await this.db.models.BaseModel.findAll({
             where: {
                 ArenaID: req.params.id
             }
@@ -70,7 +70,7 @@ class BaseController implements Controller {
     }
 
     private async updateBase(req: express.Request, res: express.Response) {
-        await this.db.models.BaseTableController.findByPk(req.params.id)
+        await this.db.models.BaseModel.findByPk(req.params.id)
             .then(r => {
                 if (r) {
                     r.update({
@@ -93,7 +93,7 @@ class BaseController implements Controller {
     }
 
     private async deleteBase(req: express.Request, res: express.Response) {
-        await this.db.models.BaseTableController.destroy({
+        await this.db.models.BaseModel.destroy({
             where: {
                 BaseID: req.params.id
             }
