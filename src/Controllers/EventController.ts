@@ -1,17 +1,8 @@
-import { json } from "body-parser";
 import express from "express";
-import { validate } from "express-jsonschema";
-import { type } from "os";
 import { Sequelize } from "sequelize-typescript";
-import { JSON } from "sequelize/types";
-import { Json } from "sequelize/types/lib/utils";
 import { Controller } from "../Common/Controller";
-// import schemas from "../Configuration/JsonSchemas/EventsControllerSchemas";
+
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
-import BaseToEventModel from "../Models/Database/BaseToEventModel";
-
-
-
 class EventController implements Controller {
 
     path: string;
