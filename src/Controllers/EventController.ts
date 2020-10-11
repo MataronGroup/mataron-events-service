@@ -166,6 +166,7 @@ class EventController implements Controller {
 
 
                         const stand : any= await this.db.models.StandModel.create({
+                            id: req.body.bases[i].room[k].this.stands[m].id,
                             DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
                             NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
                             RoomsID: room.RoomsID,
@@ -199,8 +200,7 @@ class EventController implements Controller {
                 }
             }
         }
-
-
+            
             res.send("ok");
 
 
