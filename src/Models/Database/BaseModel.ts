@@ -1,8 +1,8 @@
-import {AutoIncrement, Column, ForeignKey, HasMany, Model, PrimaryKey, Table} from "sequelize-typescript";
+import {AutoIncrement, Column, HasMany, Model, PrimaryKey, Table} from "sequelize-typescript";
 import RoomsTableModel from "./RoomsTableModel";
 
 @Table({tableName:"Base",timestamps: false})
-class BaseTableController extends Model<BaseTableController>
+class BaseModel extends Model<BaseModel>
 {
     @PrimaryKey
     @AutoIncrement
@@ -19,4 +19,4 @@ class BaseTableController extends Model<BaseTableController>
     Rooms : RoomsTableModel[]
 }
 
-export default BaseTableController;
+export default BaseModel;

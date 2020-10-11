@@ -1,5 +1,5 @@
 import {AutoIncrement, BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table} from "sequelize-typescript";
-import BaseTableController from "./BaseTableController";
+import BaseModel from "./BaseModel";
 
 @Table({tableName:"Rooms",timestamps: false})
 class RoomsTableModel extends Model<RoomsTableModel>
@@ -15,12 +15,13 @@ class RoomsTableModel extends Model<RoomsTableModel>
     @Column
     BaseID: number;
 
-    @ForeignKey(() =>BaseTableController)
+    @ForeignKey(() =>BaseModel)
     @Column
     EventID: number;
 
-    @BelongsTo(() => BaseTableController)
-    bases : BaseTableController
+    @BelongsTo(() => BaseModel)
+    bases : BaseModel
+
 }
 
 export default RoomsTableModel;
