@@ -1,17 +1,8 @@
-import { json } from "body-parser";
 import express from "express";
-import { validate } from "express-jsonschema";
-import { type } from "os";
 import { Sequelize } from "sequelize-typescript";
-import { JSON } from "sequelize/types";
-import { Json } from "sequelize/types/lib/utils";
-import { findRule } from "tslint";
 import { Controller } from "../Common/Controller";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
-import BaseToEventModel from "../Models/Database/BaseToEventModel";
-
-
-
+import {validate} from "express-jsonschema";
 class EventController implements Controller {
 
     path: string;
@@ -27,6 +18,7 @@ class EventController implements Controller {
         this.initializeRoutes();
 
     }
+
 
     private initializeSchema() {
         return ({
@@ -200,11 +192,7 @@ class EventController implements Controller {
                 }
             }
         }
-            
-            res.send("ok");
-
-
-
+        res.send("ok");
     }
 
     private async getEvent(req: express.Request, res: express.Response) {

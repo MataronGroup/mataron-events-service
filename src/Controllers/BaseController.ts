@@ -33,7 +33,8 @@ class BaseController implements Controller {
     private async createBase(req: express.Request, res: express.Response) {
         await this.db.models.BaseModel.create({
             Name: req.body.Name,
-            ArenaID: req.body.ArenaID
+            ArenaID: req.body.ArenaID,
+            EventId : req.body.EventId
         })
             .then(r => {
                 res.send(r);
@@ -99,10 +100,12 @@ class BaseController implements Controller {
         }
     }
     private async getAllBasesByEvent(req: express.Request, res: express.Response) {
-            await this.db.query(`select b.Name ,b.BaseID ,r.EventID  from Base as b
-            join Rooms as r on (b.BaseID = r.BaseID)
-            where r.EventID = ${req.params.id}
-            group by b.Name , b.BaseID , r.EventID`,{nest: true})
+            await this.db.models.BaseModel.findAll({
+                nest : true,
+                where : {
+                    EventId : req.params.id
+                }
+            })
             .then(r => {
                 res.send(r);
             })
