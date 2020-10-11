@@ -19,6 +19,7 @@ class EventController implements Controller {
 
     }
 
+    
     private initializeSchema() {
         return ({
             type: 'object',
