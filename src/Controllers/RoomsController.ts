@@ -33,7 +33,8 @@ class RoomsController implements Controller
 
         await this.db.models.RoomsTableModel.create({
             Name: req.body.Name,
-            BaseID: req.body.Base
+            BaseID: req.body.BaseID,
+            EventID: req.body.EventID
         })
             .then(r => {
                 res.send(r);
