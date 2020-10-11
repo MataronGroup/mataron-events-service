@@ -9,6 +9,10 @@ import ProfessionsTableModel from "../Models/Database/ProfessionsTableModel";
 import StandModel from "../Models/Database/StandModel";
 import UsersModel from "../Models/Database/UsersModel";
 import BaseModel from "../Models/Database/BaseModel";
+import BaseToEventModel from "../Models/Database/BaseToEventModel";
+import NetworkModel from "../Models/Database/NetworkModel";
+
+
 
 
 
@@ -27,6 +31,9 @@ const DBConnection =
               StandModel,
               UsersModel,
               BaseModel,
+              NetworkModel,
+              BaseToEventModel
+
 
           ]
       });
