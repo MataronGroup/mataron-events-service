@@ -103,6 +103,13 @@ class EventController implements Controller {
                     EventID: event.EventID
                 }).then(r => r.toJSON());
 
+                await this.db.models.BaseToEventModel.create({
+                    BaseID: req.body.bases[i].BaseId,
+                    EventID: event.EventID
+                })
+
+
+
                 for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
                     console.log(m)
 
