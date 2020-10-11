@@ -36,8 +36,6 @@ const DBConnection =
               NetworkModel,
               BaseToEventModel,
               StandToNetworksModel
-
-
           ]
       });
 
