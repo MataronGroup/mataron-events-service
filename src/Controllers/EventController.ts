@@ -7,7 +7,6 @@ import { JSON } from "sequelize/types";
 import { Json } from "sequelize/types/lib/utils";
 import { findRule } from "tslint";
 import { Controller } from "../Common/Controller";
-// import schemas from "../Configuration/JsonSchemas/EventsControllerSchemas";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
 import BaseToEventModel from "../Models/Database/BaseToEventModel";
 
@@ -37,36 +36,83 @@ class EventController implements Controller {
                     type: 'number',
                     required: true
                 },
-                BaseId: {
-                    type: 'number',
+                Name:{
+                    type:'string',
                     required: true
                 },
-                RoomId: {
-                    type: 'number',
-                    required: true
-                },
-                Box: {
-                    type: 'number',
-                    required: true
-                },
+                bases: {
+                    type: 'array',
+                    items: {
+                        type: 'Object',
+                        properties: {
+                            BaseId : {
+                                type: 'number',
+                                reqired: true
+                            },
+                            room:
+                            {
+                                type: 'array',
+                                items: {
+                                    type: 'Object',
+                                    properties: {
+                                        Name: {
+                                            type: 'string',
+                                            reqired: true
+                                        },
+                                        stands: {
+                                            type: 'array',
+                                            items: {
+                                                type: 'Object',
+                                                properties: {
+                                                    x:{
+                                                        type: 'number',
+                                                        reqired: true
+                                                    },
+                                                    y:{
+                                                        type: 'number',
+                                                        reqired: true
+                                                    },
+                                                    cellname:{
+                                                        type: 'string',
+                                                        reqired: true
+                                                    },
+                                                    soldiers: {
+                                                        type: 'array',
+                                                        items:{
+                                                            type: 'Object',
+                                                            properties: {
+                                                                DaySoldier:{
+                                                                    type: 'string',
+                                                                    reqired: false
+                                                                },
+                                                                NightSoldier:{
+                                                                    type: 'string',
+                                                                    reqired: false
+                                                                },
+                                                    network:{
+                                                        type:'array',
+                                                        items:{
+                                                            type:'object',
+                                                            properties:{
 
+                                                            }
 
-                // Soldiers: {
-                //     type: 'array',
-                //     required: true,
-                //     items: [{type: "object",
-                //     properties: {
-                //         Id: {
-                //             type: "number",
-                //             required: true
-                //         },
-                //         Cell:{
-                //             typr:'number',
-                //             required: true
+                                                        }
+                                                    }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-                //         }}
-                //     }]
-                // }
+                }
+
 
 
 
@@ -76,11 +122,11 @@ class EventController implements Controller {
     }
 
     private initializeRoutes() {
-        this.router.post(this.path, this.createEvent.bind(this));
+        this.router.post(this.path,validate({body: this.schema}), this.createEvent.bind(this));
         this.router.get(`${this.path}/:id`, this.getEvent.bind(this));
         this.router.get(`${this.path}`, this.getEvents.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteEvent.bind(this));
-        this.router.put(`${this.path}/:id`, this.updateEvent.bind(this));
+        this.router.put(`${this.path}/:id`, validate({body: this.schema}),this.updateEvent.bind(this));
 
     }
 
