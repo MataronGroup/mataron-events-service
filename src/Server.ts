@@ -7,6 +7,8 @@ import {server} from "./Configuration/AppConfiguration.json";
 import ArenaController from "./Controllers/ArenaController";
 import BaseController from "./Controllers/BaseController";
 import JobsController from "./Controllers/JobsController";
+import NetworkController from "./Controllers/NetworkController";
+
 import ProfessionsController from "./Controllers/ProfessionsController";
 
 
@@ -19,8 +21,10 @@ const app = new App(
         new ProfessionsController(db),
         new RoomsController(db),
         new EventController(db),
+        new NetworkController(db)
+
     ],
-    server.port,
+    server.port
 );
 
 app.listen();
