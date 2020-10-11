@@ -33,8 +33,6 @@ const DBConnection =
               BaseModel,
               NetworkModel,
               BaseToEventModel
-
-
           ]
       });
 
