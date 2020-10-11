@@ -11,6 +11,8 @@ import UsersModel from "../Models/Database/UsersModel";
 import BaseModel from "../Models/Database/BaseModel";
 import BaseToEventModel from "../Models/Database/BaseToEventModel";
 import NetworkModel from "../Models/Database/NetworkModel";
+import StandToNetworksModel from "../Models/Database/StandToNetworksModel";
+
 
 
 
@@ -32,7 +34,8 @@ const DBConnection =
               UsersModel,
               BaseModel,
               NetworkModel,
-              BaseToEventModel
+              BaseToEventModel,
+              StandToNetworksModel
           ]
       });
 

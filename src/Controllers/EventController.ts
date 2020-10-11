@@ -1,8 +1,8 @@
 import express from "express";
 import { Sequelize } from "sequelize-typescript";
 import { Controller } from "../Common/Controller";
-
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
+import {validate} from "express-jsonschema";
 class EventController implements Controller {
 
     path: string;
@@ -19,7 +19,7 @@ class EventController implements Controller {
 
     }
 
-    
+
     private initializeSchema() {
         return ({
             type: 'object',
@@ -28,36 +28,83 @@ class EventController implements Controller {
                     type: 'number',
                     required: true
                 },
-                BaseId: {
-                    type: 'number',
+                Name:{
+                    type:'string',
                     required: true
                 },
-                RoomId: {
-                    type: 'number',
-                    required: true
-                },
-                Box: {
-                    type: 'number',
-                    required: true
-                },
+                bases: {
+                    type: 'array',
+                    items: {
+                        type: 'Object',
+                        properties: {
+                            BaseId : {
+                                type: 'number',
+                                reqired: true
+                            },
+                            room:
+                            {
+                                type: 'array',
+                                items: {
+                                    type: 'Object',
+                                    properties: {
+                                        Name: {
+                                            type: 'string',
+                                            reqired: true
+                                        },
+                                        stands: {
+                                            type: 'array',
+                                            items: {
+                                                type: 'Object',
+                                                properties: {
+                                                    x:{
+                                                        type: 'number',
+                                                        reqired: true
+                                                    },
+                                                    y:{
+                                                        type: 'number',
+                                                        reqired: true
+                                                    },
+                                                    cellname:{
+                                                        type: 'string',
+                                                        reqired: true
+                                                    },
+                                                    soldiers: {
+                                                        type: 'array',
+                                                        items:{
+                                                            type: 'Object',
+                                                            properties: {
+                                                                DaySoldier:{
+                                                                    type: 'string',
+                                                                    reqired: false
+                                                                },
+                                                                NightSoldier:{
+                                                                    type: 'string',
+                                                                    reqired: false
+                                                                },
+                                                    network:{
+                                                        type:'array',
+                                                        items:{
+                                                            type:'object',
+                                                            properties:{
 
+                                                            }
 
-                // Soldiers: {
-                //     type: 'array',
-                //     required: true,
-                //     items: [{type: "object",
-                //     properties: {
-                //         Id: {
-                //             type: "number",
-                //             required: true
-                //         },
-                //         Cell:{
-                //             typr:'number',
-                //             required: true
+                                                        }
+                                                    }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-                //         }}
-                //     }]
-                // }
+                }
+
 
 
 
@@ -67,11 +114,11 @@ class EventController implements Controller {
     }
 
     private initializeRoutes() {
-        this.router.post(this.path, this.createEvent.bind(this));
+        this.router.post(this.path,validate({body: this.schema}), this.createEvent.bind(this));
         this.router.get(`${this.path}/:id`, this.getEvent.bind(this));
         this.router.get(`${this.path}`, this.getEvents.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteEvent.bind(this));
-        this.router.put(`${this.path}/:id`, this.updateEvent.bind(this));
+        this.router.put(`${this.path}/:id`, validate({body: this.schema}),this.updateEvent.bind(this));
 
     }
 
@@ -95,29 +142,23 @@ class EventController implements Controller {
                     EventID: event.EventID
                 }).then(r => r.toJSON());
 
+                await this.db.models.BaseToEventModel.create({
+                    BaseID: req.body.bases[i].BaseId,
+                    EventID: event.EventID
+                })
+
+
+
                 for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
                     console.log(m)
 
-                    /////////// ForOf as need, I did not use it////////////
-                    // for(let soldier of req.body.bases[i].room[k].stands[m].soldiers){
-                    //     await this.db.models.StandModel.create({
-                    //         DayUserID: soldier,
-                    //         NightUserID: soldier
-                    //     })
-
-                    //         .then(r => {
-                    //             res.send(r);
-                    //         })
-                    //         .catch(e => {
-                    //             res.status(500).send(e.original.message);
-                    //         });
-                    // }
 
                     for (let n = 0; n < req.body.bases[i].room[k].stands[m].soldiers.length; n++) {
                         console.log(n)
 
 
-                        const stand = await this.db.models.StandModel.create({
+                        const stand : any= await this.db.models.StandModel.create({
+                            id: req.body.bases[i].room[k].this.stands[m].id,
                             DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
                             NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
                             RoomsID: room.RoomsID,
@@ -125,20 +166,33 @@ class EventController implements Controller {
                             Y: req.body.bases[i].room[k].stands[m].y,
                             CellName: req.body.bases[i].room[k].stands[m].cellname
 
-                        })
 
-                            .then(r => {
-                                res.send(r);
+
+                        }).then(g=>g.toJSON());
+
+                        for(let y=0; y<req.body.bases[i].room[k].stands[m].network.length; y++){
+                            console.log(y)
+                            console.log(stand.StandID)
+                            console.log(req.body.bases[i].room[k].stands[m].network[y])
+
+
+                             await this.db.models.StandToNetworksModel.create({
+                                StandID: stand.StandID,
+                                NetworksID: req.body.bases[i].room[k].stands[m].network[y]
+
+
                             })
-                            .catch(e => {
-                                res.status(500).send(e.original.message);
-                            });
+
+
+
+                    }
+
 
                     }
                 }
             }
         }
-
+        res.send("ok");
     }
 
     private async getEvent(req: express.Request, res: express.Response) {
@@ -221,8 +275,8 @@ class EventController implements Controller {
                                 })
                                 .then((rrr : any) => rrr[1][0])
                                 .catch(err => console.log(err))
-                            // .then(rr => console.log(rr));s
-                            console.log(room)
+
+                                console.log(room)
 
                             for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
                                 console.log(m)
