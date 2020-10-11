@@ -26,10 +26,6 @@ class StandModel extends Model<StandModel>
     @Column
     NightUserID:string;
 
-
-
-
-
 }
 
 export default StandModel;
