@@ -5,6 +5,7 @@ import { type } from "os";
 import { Sequelize } from "sequelize-typescript";
 import { JSON } from "sequelize/types";
 import { Json } from "sequelize/types/lib/utils";
+import { findRule } from "tslint";
 import { Controller } from "../Common/Controller";
 // import schemas from "../Configuration/JsonSchemas/EventsControllerSchemas";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
@@ -113,26 +114,12 @@ class EventController implements Controller {
                 for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
                     console.log(m)
 
-                    /////////// ForOf as need, I did not use it////////////
-                    // for(let soldier of req.body.bases[i].room[k].stands[m].soldiers){
-                    //     await this.db.models.StandModel.create({
-                    //         DayUserID: soldier,
-                    //         NightUserID: soldier
-                    //     })
-
-                    //         .then(r => {
-                    //             res.send(r);
-                    //         })
-                    //         .catch(e => {
-                    //             res.status(500).send(e.original.message);
-                    //         });
-                    // }
 
                     for (let n = 0; n < req.body.bases[i].room[k].stands[m].soldiers.length; n++) {
                         console.log(n)
 
 
-                        const stand = await this.db.models.StandModel.create({
+                        const stand : any= await this.db.models.StandModel.create({
                             DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
                             NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
                             RoomsID: room.RoomsID,
@@ -140,19 +127,37 @@ class EventController implements Controller {
                             Y: req.body.bases[i].room[k].stands[m].y,
                             CellName: req.body.bases[i].room[k].stands[m].cellname
 
-                        })
 
-                            .then(r => {
-                                res.send(r);
+
+                        }).then(g=>g.toJSON());
+
+                        for(let y=0; y<req.body.bases[i].room[k].stands[m].network.length; y++){
+                            console.log(y)
+                            console.log(stand.StandID)
+                            console.log(req.body.bases[i].room[k].stands[m].network[y])
+
+
+                             await this.db.models.StandToNetworksModel.create({
+                                StandID: stand.StandID,
+                                NetworksID: req.body.bases[i].room[k].stands[m].network[y]
+
+
                             })
-                            .catch(e => {
-                                res.status(500).send(e.original.message);
-                            });
+
+
+
+                    }
+
 
                     }
                 }
             }
         }
+
+
+            res.send("ok");
+
+
 
     }
 
@@ -236,8 +241,8 @@ class EventController implements Controller {
                                 })
                                 .then((rrr : any) => rrr[1][0])
                                 .catch(err => console.log(err))
-                            // .then(rr => console.log(rr));s
-                            console.log(room)
+
+                                console.log(room)
 
                             for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
                                 console.log(m)
