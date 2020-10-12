@@ -10,11 +10,6 @@ class NetworkModel extends Model<NetworkModel>
 
     @Column
     Type: string
-
-
-
-
-
 }
 
 export default NetworkModel;

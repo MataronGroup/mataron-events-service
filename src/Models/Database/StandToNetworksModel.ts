@@ -8,7 +8,6 @@ class StandToNetworksModel extends Model<StandToNetworksModel>
 
     @Column
     NetworksID: number;
-
 }
 
 export default StandToNetworksModel

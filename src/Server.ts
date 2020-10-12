@@ -8,9 +8,9 @@ import ArenaController from "./Controllers/ArenaController";
 import BaseController from "./Controllers/BaseController";
 import JobsController from "./Controllers/JobsController";
 import NetworkController from "./Controllers/NetworkController";
-
 import ProfessionsController from "./Controllers/ProfessionsController";
 import StatisticsController from "./Controllers/StatisticsController";
+import StandController from "./Controllers/StandsController";
 
 
 const db = DBConnection;
@@ -23,7 +23,7 @@ const app = new App(
         new RoomsController(db),
         new EventController(db),
         new NetworkController(db),
-
+        new StandController(db),
         new StatisticsController(db)
     ],
     server.port
