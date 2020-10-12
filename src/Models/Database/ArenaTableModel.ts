@@ -3,6 +3,7 @@ import {AutoIncrement, Column, Model, PrimaryKey, Table} from "sequelize-typescr
 @Table({tableName:"Arena",timestamps: false})
 class ArenaTableModel extends Model<ArenaTableModel>
 {
+    @AutoIncrement
     @PrimaryKey
     @Column
     Id: number;
