@@ -24,7 +24,7 @@ class NetworkController implements Controller
 
     private async getNetwork(req: express.Request, res: express.Response) {
 
-        await this.db.models.ArenaTableModel.findAll()
+        await this.db.models.NetworkModel.findAll()
             .then(r => {
                 res.send(r);
             })
