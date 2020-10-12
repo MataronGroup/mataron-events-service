@@ -6,13 +6,13 @@ const schemas = {
                 type: 'string',
                 required: true
             },
-            BaseID: {
+            ArenaID: {
                 type: 'number',
                 required: true
             },
-            EventID: {
-                type: 'number',
-                required: true
+            EventId : {
+                type : 'number',
+                required : true
             }
         }
     }

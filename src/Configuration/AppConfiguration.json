@@ -7,6 +7,6 @@
     "dialect": "mssql"
   },
   "server": {
-    "port": 5000
+    "port": 9001
   }
 }
