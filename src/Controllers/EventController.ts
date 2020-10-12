@@ -296,13 +296,15 @@ class EventController implements Controller {
                                     console.log(n)
 
                                     // tslint:disable-next-line:radix
-                                    const standId = parseInt(req.body.bases[i].room[k].stands[m].soldiers[n].StandId)
+                                    const standId = req.body.bases[i].room[k].stands[m].StandId
+                                    console.log("standid")
+                                    console.log(standId)
                                     const stand = await this.db.models.StandModel.update({
                                         DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
                                         NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
                                         RoomsID: room.dataValues.RoomsID,
-                                        X: req.body.bases[i].room[k].stands[m].x,
-                                        Y: req.body.bases[i].room[k].stands[m].y,
+                                        X: req.body.bases[i].room[k].stands[m].X,
+                                        Y: req.body.bases[i].room[k].stands[m].Y,
                                         CellName: req.body.bases[i].room[k].stands[m].cellname
 
                                     }, { where: {RoomsID:room.dataValues.RoomsID , StandID : standId } })
