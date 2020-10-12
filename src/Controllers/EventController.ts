@@ -47,6 +47,10 @@ class EventController implements Controller {
                                 items: {
                                     type: 'Object',
                                     properties: {
+                                        RoomId: {
+                                            type: 'number',
+                                            required: false
+                                        },
                                         Name: {
                                             type: 'string',
                                             required: true
@@ -56,6 +60,10 @@ class EventController implements Controller {
                                             items: {
                                                 type: 'Object',
                                                 properties: {
+                                                    StandId:{
+                                                        type: 'string',
+                                                        required: false
+                                                    },
                                                     X:{
                                                         type: 'number',
                                                         required: true
@@ -266,13 +274,13 @@ class EventController implements Controller {
 
                         for (let k = 0; k < req.body.bases[i].room.length; k++) {
                             console.log(k);
-
+                            const roomId = req.body.bases[i].room[k].RoomId
                             const room: any = await this.db.models.RoomsTableModel.update({
                                 Name: req.body.bases[i].room[k].Name,
                                 BaseID: req.body.bases[i].BaseId
                             },
                                 {
-                                    where: { EventID: req.params.id },
+                                    where: { EventID: req.params.id,RoomsID : roomId },
                                     returning:true
                                 })
                                 .then((rrr : any) => rrr[1][0])
@@ -287,7 +295,8 @@ class EventController implements Controller {
                                 for (let n = 0; n < req.body.bases[i].room[k].stands[m].soldiers.length; n++) {
                                     console.log(n)
 
-
+                                    // tslint:disable-next-line:radix
+                                    const standId = parseInt(req.body.bases[i].room[k].stands[m].soldiers[n].StandId)
                                     const stand = await this.db.models.StandModel.update({
                                         DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
                                         NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
@@ -296,7 +305,7 @@ class EventController implements Controller {
                                         Y: req.body.bases[i].room[k].stands[m].y,
                                         CellName: req.body.bases[i].room[k].stands[m].cellname
 
-                                    }, { where: {RoomsID:room.dataValues.RoomsID} })
+                                    }, { where: {RoomsID:room.dataValues.RoomsID , StandID : standId } })
 
                                         .then(rp => {
                                             res.send(rp);
@@ -313,9 +322,10 @@ class EventController implements Controller {
                 else {
                     res.status(404).send(new ErrorResponse(`cannot find room id ${req.params.id}`));
                 }
+            }).catch(err => {
+                res.status(500).send({"error": err})
             })
-
-        res.send("ok");
+        res.status(200).json({"status":"success"});
 
     }
 

@@ -103,11 +103,16 @@ class BaseController implements Controller {
                 join Stand as s on (s.RoomsID = r.RoomsID)
                 join Users as u on (u.PersonalID = s.DayUserID)
                 where r.EventID = ${req.params.eventId} and b.BaseId = ${req.params.baseId} and s.NightUserID != s.DayUserID
-                group by b.Name`, {nest: true})
-
-            const countNight : number =solidersInNight[0].solidersCount as number;
-            const countDay : number = solidersDay[0].solidersCount as number;
-            res.send({baseName : solidersDay[0].Name , count : countNight + countDay })
+                group by b.Name`, {nest: true});
+            let countNight : number = 0;
+            let countDay : number = 0;
+            if (solidersInNight.length > 0){
+                countNight = solidersInNight[0].solidersCount as number;
+            }
+            if (solidersDay.length > 0){
+                countDay = solidersDay[0].solidersCount as number;
+            }
+            res.send({count : countNight + countDay })
         }
         catch (err){
             res.status(500).send(new ErrorResponse(err.message));
