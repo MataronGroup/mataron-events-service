@@ -23,11 +23,25 @@ class BaseController implements Controller {
     private initializeRoutes() {
         this.router.post(`${this.path}`, validate({body: this.schema}), this.createBase.bind(this));
         this.router.get(`${this.path}/:id`, this.getBase.bind(this));
+        this.router.get(`${this.path}s`, this.getAllBases.bind(this));
         this.router.get(`${this.path}/getAllBasesByEvent/:id`, this.getAllBasesByEvent.bind(this));
         this.router.get(`${this.path}/event/:eventId/base/:baseId/soliders`, this.getAllSolidersInBase.bind(this));
         this.router.get(`${this.path}/arena/:id`, this.getBaseByArena.bind(this));
         this.router.put(`${this.path}/:id`, this.updateBase.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteBase.bind(this));
+    }
+
+    private async getAllBases(req: express.Request, res: express.Response) {
+        await this.db.query(`select b.BaseID , b.Name as baseName , a.Type as arenaName , e.Name as eventName from Base as b
+                              join Event as e on (e.EventID = b.EventId)
+                              join Arena as a on (a.Id = b.ArenaID)
+                            `,{nest : true})
+            .then(r => {
+                res.send(r);
+            })
+            .catch(e => {
+                res.status(500).send(new ErrorResponse(e));
+            })
     }
 
     private async createBase(req: express.Request, res: express.Response) {
