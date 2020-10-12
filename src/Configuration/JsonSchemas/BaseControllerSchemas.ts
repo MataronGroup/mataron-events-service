@@ -9,6 +9,10 @@ const schemas = {
             ArenaID: {
                 type: 'number',
                 required: true
+            },
+            EventId : {
+                type : 'number',
+                required : true
             }
         }
     }

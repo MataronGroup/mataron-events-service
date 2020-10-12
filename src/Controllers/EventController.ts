@@ -1,17 +1,8 @@
-import { json } from "body-parser";
 import express from "express";
-import { validate } from "express-jsonschema";
-import { type } from "os";
 import { Sequelize } from "sequelize-typescript";
-import { JSON } from "sequelize/types";
-import { Json } from "sequelize/types/lib/utils";
-import { findRule } from "tslint";
 import { Controller } from "../Common/Controller";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
-import BaseToEventModel from "../Models/Database/BaseToEventModel";
-
-
-
+import {validate} from "express-jsonschema";
 class EventController implements Controller {
 
     path: string;
@@ -27,6 +18,7 @@ class EventController implements Controller {
         this.initializeRoutes();
 
     }
+
 
     private initializeSchema() {
         return ({
@@ -47,7 +39,7 @@ class EventController implements Controller {
                         properties: {
                             BaseId : {
                                 type: 'number',
-                                reqired: true
+                                required: true
                             },
                             room:
                             {
@@ -55,26 +47,34 @@ class EventController implements Controller {
                                 items: {
                                     type: 'Object',
                                     properties: {
+                                        RoomId: {
+                                            type: 'number',
+                                            required: false
+                                        },
                                         Name: {
                                             type: 'string',
-                                            reqired: true
+                                            required: true
                                         },
                                         stands: {
                                             type: 'array',
                                             items: {
                                                 type: 'Object',
                                                 properties: {
-                                                    x:{
-                                                        type: 'number',
-                                                        reqired: true
+                                                    StandId:{
+                                                        type: 'string',
+                                                        required: false
                                                     },
-                                                    y:{
+                                                    X:{
                                                         type: 'number',
-                                                        reqired: true
+                                                        required: true
+                                                    },
+                                                    Y:{
+                                                        type: 'number',
+                                                        required: true
                                                     },
                                                     cellname:{
                                                         type: 'string',
-                                                        reqired: true
+                                                        required: false
                                                     },
                                                     soldiers: {
                                                         type: 'array',
@@ -83,11 +83,11 @@ class EventController implements Controller {
                                                             properties: {
                                                                 DaySoldier:{
                                                                     type: 'string',
-                                                                    reqired: false
+                                                                    required: false
                                                                 },
                                                                 NightSoldier:{
                                                                     type: 'string',
-                                                                    reqired: false
+                                                                    required: false
                                                                 },
                                                     network:{
                                                         type:'array',
@@ -95,7 +95,8 @@ class EventController implements Controller {
                                                             type:'object',
                                                             properties:{
 
-                                                            }
+                                                            },
+                                                            required: false
 
                                                         }
                                                     }
@@ -163,34 +164,36 @@ class EventController implements Controller {
 
                     for (let n = 0; n < req.body.bases[i].room[k].stands[m].soldiers.length; n++) {
                         console.log(n)
-
+                        console.log("stands:");
+                        console.log(req.body.bases[i].room[k].stands[m].soldiers[n]);
 
                         const stand : any= await this.db.models.StandModel.create({
-                            id: req.body.bases[i].room[k].this.stands[m].id,
+                            id: req.body.bases[i].room[k].stands[m].id,
                             DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
                             NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
                             RoomsID: room.RoomsID,
-                            X: req.body.bases[i].room[k].stands[m].x,
-                            Y: req.body.bases[i].room[k].stands[m].y,
+                            X: req.body.bases[i].room[k].stands[m].X,
+                            Y: req.body.bases[i].room[k].stands[m].Y,
                             CellName: req.body.bases[i].room[k].stands[m].cellname
 
 
 
                         }).then(g=>g.toJSON());
-
-                        for(let y=0; y<req.body.bases[i].room[k].stands[m].network.length; y++){
+                        if(req.body.bases[i].room[k].stands[m].network)
+                        {
+                        for(let y=0; y<req.body.bases[i].room[k].stands[m].network.length; y++) {
                             console.log(y)
                             console.log(stand.StandID)
                             console.log(req.body.bases[i].room[k].stands[m].network[y])
 
 
-                             await this.db.models.StandToNetworksModel.create({
+                            await this.db.models.StandToNetworksModel.create({
                                 StandID: stand.StandID,
                                 NetworksID: req.body.bases[i].room[k].stands[m].network[y]
 
 
                             })
-
+                        }
 
 
                     }
@@ -200,11 +203,7 @@ class EventController implements Controller {
                 }
             }
         }
-            
-            res.send("ok");
-
-
-
+        res.send("ok");
     }
 
     private async getEvent(req: express.Request, res: express.Response) {
@@ -267,8 +266,7 @@ class EventController implements Controller {
             .then(async r => {
                 if (r) {
                     const event: any = await this.db.models.EventsModel.update({
-                        Name: req.body.Name,
-
+                        Name: req.body.Name
                     }, { where: { EventID: req.params.id } })
 
                     for (let i = 0; i < req.body.bases.length; i++) {
@@ -276,13 +274,13 @@ class EventController implements Controller {
 
                         for (let k = 0; k < req.body.bases[i].room.length; k++) {
                             console.log(k);
-
+                            const roomId = req.body.bases[i].room[k].RoomId
                             const room: any = await this.db.models.RoomsTableModel.update({
                                 Name: req.body.bases[i].room[k].Name,
                                 BaseID: req.body.bases[i].BaseId
                             },
                                 {
-                                    where: { EventID: req.params.id },
+                                    where: { EventID: req.params.id,RoomsID : roomId },
                                     returning:true
                                 })
                                 .then((rrr : any) => rrr[1][0])
@@ -297,7 +295,8 @@ class EventController implements Controller {
                                 for (let n = 0; n < req.body.bases[i].room[k].stands[m].soldiers.length; n++) {
                                     console.log(n)
 
-
+                                    // tslint:disable-next-line:radix
+                                    const standId = parseInt(req.body.bases[i].room[k].stands[m].soldiers[n].StandId)
                                     const stand = await this.db.models.StandModel.update({
                                         DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
                                         NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
@@ -306,7 +305,7 @@ class EventController implements Controller {
                                         Y: req.body.bases[i].room[k].stands[m].y,
                                         CellName: req.body.bases[i].room[k].stands[m].cellname
 
-                                    }, { where: {RoomsID:room.dataValues.RoomsID} })
+                                    }, { where: {RoomsID:room.dataValues.RoomsID , StandID : standId } })
 
                                         .then(rp => {
                                             res.send(rp);
@@ -323,9 +322,10 @@ class EventController implements Controller {
                 else {
                     res.status(404).send(new ErrorResponse(`cannot find room id ${req.params.id}`));
                 }
+            }).catch(err => {
+                res.status(500).send({"error": err})
             })
-
-
+        res.status(200).json({"status":"success"});
 
     }
 
