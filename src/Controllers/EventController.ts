@@ -39,7 +39,7 @@ class EventController implements Controller {
                         properties: {
                             BaseId : {
                                 type: 'number',
-                                reqired: true
+                                required: true
                             },
                             room:
                             {
@@ -49,24 +49,24 @@ class EventController implements Controller {
                                     properties: {
                                         Name: {
                                             type: 'string',
-                                            reqired: true
+                                            required: true
                                         },
                                         stands: {
                                             type: 'array',
                                             items: {
                                                 type: 'Object',
                                                 properties: {
-                                                    x:{
+                                                    X:{
                                                         type: 'number',
-                                                        reqired: true
+                                                        required: true
                                                     },
-                                                    y:{
+                                                    Y:{
                                                         type: 'number',
-                                                        reqired: true
+                                                        required: true
                                                     },
                                                     cellname:{
                                                         type: 'string',
-                                                        reqired: true
+                                                        required: false
                                                     },
                                                     soldiers: {
                                                         type: 'array',
@@ -75,11 +75,11 @@ class EventController implements Controller {
                                                             properties: {
                                                                 DaySoldier:{
                                                                     type: 'string',
-                                                                    reqired: false
+                                                                    required: false
                                                                 },
                                                                 NightSoldier:{
                                                                     type: 'string',
-                                                                    reqired: false
+                                                                    required: false
                                                                 },
                                                     network:{
                                                         type:'array',
@@ -87,7 +87,8 @@ class EventController implements Controller {
                                                             type:'object',
                                                             properties:{
 
-                                                            }
+                                                            },
+                                                            required: false
 
                                                         }
                                                     }
@@ -155,34 +156,36 @@ class EventController implements Controller {
 
                     for (let n = 0; n < req.body.bases[i].room[k].stands[m].soldiers.length; n++) {
                         console.log(n)
-
+                        console.log("stands:");
+                        console.log(req.body.bases[i].room[k].stands[m].soldiers[n]);
 
                         const stand : any= await this.db.models.StandModel.create({
-                            id: req.body.bases[i].room[k].this.stands[m].id,
+                            id: req.body.bases[i].room[k].stands[m].id,
                             DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
                             NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
                             RoomsID: room.RoomsID,
-                            X: req.body.bases[i].room[k].stands[m].x,
-                            Y: req.body.bases[i].room[k].stands[m].y,
+                            X: req.body.bases[i].room[k].stands[m].X,
+                            Y: req.body.bases[i].room[k].stands[m].Y,
                             CellName: req.body.bases[i].room[k].stands[m].cellname
 
 
 
                         }).then(g=>g.toJSON());
-
-                        for(let y=0; y<req.body.bases[i].room[k].stands[m].network.length; y++){
+                        if(req.body.bases[i].room[k].stands[m].network)
+                        {
+                        for(let y=0; y<req.body.bases[i].room[k].stands[m].network.length; y++) {
                             console.log(y)
                             console.log(stand.StandID)
                             console.log(req.body.bases[i].room[k].stands[m].network[y])
 
 
-                             await this.db.models.StandToNetworksModel.create({
+                            await this.db.models.StandToNetworksModel.create({
                                 StandID: stand.StandID,
                                 NetworksID: req.body.bases[i].room[k].stands[m].network[y]
 
 
                             })
-
+                        }
 
 
                     }
@@ -255,8 +258,7 @@ class EventController implements Controller {
             .then(async r => {
                 if (r) {
                     const event: any = await this.db.models.EventsModel.update({
-                        Name: req.body.Name,
-
+                        Name: req.body.Name
                     }, { where: { EventID: req.params.id } })
 
                     for (let i = 0; i < req.body.bases.length; i++) {
@@ -313,7 +315,7 @@ class EventController implements Controller {
                 }
             })
 
-
+        res.send("ok");
 
     }
 
