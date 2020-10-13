@@ -79,7 +79,7 @@ class RoomsController implements Controller
         await this.db.models.RoomsTableModel.findAll({where: {EventID: req.params.id,BaseId : req.params.baseId}})
             .then(r => {
                 if(r) {
-                    res.end(r);
+                    res.send(r);
                 }
                 else {
                     res.status(404).send(new ErrorResponse(`cannot find event id ${req.params.id}`))
