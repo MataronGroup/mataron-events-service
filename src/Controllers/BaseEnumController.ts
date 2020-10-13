@@ -39,6 +39,7 @@ export default  class BaseEnumController implements Controller
 
     private async createBaseEnum(req: express.Request, res: express.Response) {
         const type = req.body.BaseName;
+        const arenaId = req.body.ArenaID;
         await this.db.models.BaseEnumModel.findOne({where : {BaseName : type}})
             .then(async r => {
                 if (r){
@@ -46,7 +47,8 @@ export default  class BaseEnumController implements Controller
                 }
                 else {
                     await this.db.models.BaseEnumModel.create({
-                        BaseName : type
+                        BaseName : type,
+                        ArenaID : arenaId
                     }).then(responeCreate => {
                         res.send(responeCreate)
                     }).catch(errorCreate => {

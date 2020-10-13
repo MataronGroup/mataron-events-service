@@ -11,4 +11,7 @@ export default class BaseEnumModel extends Model<BaseEnumModel>
 
     @Column
     BaseName: string;
+
+    @Column
+    ArenaID: number;
 }

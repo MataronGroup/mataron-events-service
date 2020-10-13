@@ -5,6 +5,10 @@ const baseEnumSchemas = {
             BaseName: {
                 type: 'string',
                 required: true
+            },
+            ArenaID: {
+                type: 'number',
+                required: true
             }
         }
     }

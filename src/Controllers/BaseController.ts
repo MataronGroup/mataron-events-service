@@ -73,12 +73,7 @@ class BaseController implements Controller {
     }
 
     private async getBaseByArena(req: express.Request, res: express.Response) {
-        await this.db.models.BaseModel.findAll({
-
-            where: {
-                ArenaID: req.params.id
-            }
-        })
+        await this.db.query(`select * from BaseEnum as b where ArenaID = ${req.params.id}`,{nest: true})
             .then(r => {
                 res.send(r);
             })
