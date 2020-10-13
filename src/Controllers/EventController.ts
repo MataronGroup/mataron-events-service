@@ -5,6 +5,7 @@ import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
 import { validate } from "express-jsonschema";
 import StandModel from "../Models/Database/StandModel";
 import StandToNetworksModel from "../Models/Database/StandToNetworksModel";
+import {isNullOrUndefined} from "util";
 class EventController implements Controller {
 
     path: string;
@@ -161,10 +162,10 @@ class EventController implements Controller {
                     EventID: event.EventID
                 }).then(r => r.toJSON());
 
-                await this.db.models.BaseToEventModel.create({
-                    BaseID: req.body.bases[i].BaseId,
-                    EventID: event.EventID
-                })
+                // await this.db.models.BaseToEventModel.create({
+                //     BaseID: req.body.bases[i].BaseId,
+                //     EventID: event.EventID
+                // })
 
 
 
@@ -261,7 +262,18 @@ class EventController implements Controller {
                 }
             })
             .catch(e => {
-                res.status(500).send(new ErrorResponse("error"));
+                console.log(e)
+                if (!isNullOrUndefined(e.original)){
+                    if (e.original.message.includes("DELETE statement conflicted with the REFERENCE constraint")){
+                        res.status(409).send(new ErrorResponse(`cannot delete event beacuse The room contain items`));
+                    }
+                    else{
+                        res.status(500).send(new ErrorResponse(e));
+                    }
+                }
+                else {
+                    res.status(500).send(new ErrorResponse(e));
+                }
             });
 
 
