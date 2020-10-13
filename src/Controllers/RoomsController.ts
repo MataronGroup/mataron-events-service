@@ -4,6 +4,7 @@ import {Sequelize} from "sequelize-typescript";
 import {validate} from "express-jsonschema";
 import schemas from "../Configuration/JsonSchemas/RoomsControllerSchemas";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
+import {isNullOrUndefined} from "util";
 
 
 class RoomsController implements Controller
@@ -132,7 +133,17 @@ class RoomsController implements Controller
                 }
             })
             .catch(e => {
-                res.status(500).send(new ErrorResponse("error"));
+                if (!isNullOrUndefined(e.original)){
+                    if (e.original.message.includes("DELETE statement conflicted with the REFERENCE constraint")){
+                        res.status(409).send(new ErrorResponse(`cannot delete room beacuse The room contain items`));
+                    }
+                    else{
+                        res.status(500).send(new ErrorResponse(e));
+                    }
+                }
+                else {
+                    res.status(500).send(new ErrorResponse(e));
+                }
             });
     }
 }
