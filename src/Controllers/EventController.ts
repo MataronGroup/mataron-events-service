@@ -183,8 +183,12 @@ class EventController implements Controller {
                             RoomsID: room.RoomsID,
                             X: req.body.bases[i].room[k].stands[m].X,
                             Y: req.body.bases[i].room[k].stands[m].Y,
-                            CellName: req.body.bases[i].room[k].stands[m].cellname
-
+                            CellName: req.body.bases[i].room[k].stands[m].cellname,
+                            BluePhone: req.body.bases[i].room[k].stands[m].blue,
+                            Bezek: req.body.bases[i].room[k].stands[m].bezek,
+                            Voip: req.body.bases[i].room[k].stands[m].voip,
+                            RedPhone: req.body.bases[i].room[k].stands[m].red,
+                            JobType: req.body.bases[i].room[k].stands[m].job,
 
 
                         }).then(g => g.toJSON());
@@ -327,7 +331,12 @@ class EventController implements Controller {
                                             RoomsID: room.dataValues.RoomsID,
                                             X: req.body.bases[i].room[k].stands[m].X,
                                             Y: req.body.bases[i].room[k].stands[m].Y,
-                                            CellName: req.body.bases[i].room[k].stands[m].cellname})}
+                                            CellName: req.body.bases[i].room[k].stands[m].cellname,
+                                            BluePhone: req.body.bases[i].room[k].stands[m].blue,
+                                            Bezek: req.body.bases[i].room[k].stands[m].bezek,
+                                            Voip: req.body.bases[i].room[k].stands[m].voip,
+                                            RedPhone: req.body.bases[i].room[k].stands[m].red,
+                                            JobType: req.body.bases[i].room[k].stands[m].job})}
                                     }).catch(e => {console.log(e)});
 
 
