@@ -13,6 +13,11 @@ import BaseToEventModel from "../Models/Database/BaseToEventModel";
 import NetworkModel from "../Models/Database/NetworkModel";
 import StandToNetworksModel from "../Models/Database/StandToNetworksModel";
 import BaseEnumModel from "../Models/Database/BaseEnumModel";
+import TemplatesModel from "../Models/Database/TemplatesModel";
+import NetworkToStandTemplatesModel from "../Models/Database/NetworkToStandTemplatesModel";
+import StandTemplatesModel from "../Models/Database/StandTemplatesModel";
+
+
 
 
 
@@ -37,7 +42,10 @@ const DBConnection =
               NetworkModel,
               BaseToEventModel,
               StandToNetworksModel,
-              BaseEnumModel
+              BaseEnumModel,
+              TemplatesModel,
+              NetworkToStandTemplatesModel,
+              StandTemplatesModel
           ]
       });
 
