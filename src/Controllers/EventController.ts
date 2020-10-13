@@ -124,7 +124,7 @@ class EventController implements Controller {
     }
 
     private initializeRoutes() {
-        this.router.post(this.path, validate({ body: this.schema }), this.createEvent.bind(this));
+        this.router.post(this.path, this.createEvent.bind(this));
         this.router.get(`${this.path}/:id`, this.getEvent.bind(this));
         this.router.get(`${this.path}`, this.getEvents.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteEvent.bind(this));
