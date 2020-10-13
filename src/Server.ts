@@ -11,6 +11,7 @@ import NetworkController from "./Controllers/NetworkController";
 import ProfessionsController from "./Controllers/ProfessionsController";
 import StatisticsController from "./Controllers/StatisticsController";
 import StandController from "./Controllers/StandsController";
+import StandsToNetworkController from "./Controllers/StandsToNetworkController";
 
 
 const db = DBConnection;
@@ -24,7 +25,8 @@ const app = new App(
         new EventController(db),
         new NetworkController(db),
         new StandController(db),
-        new StatisticsController(db)
+        new StandsToNetworkController(db),
+        new StatisticsController(db),
     ],
     server.port
 );
