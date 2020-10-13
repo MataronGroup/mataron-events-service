@@ -169,7 +169,13 @@ class BaseController implements Controller {
                 }
             })
             .catch(e => {
-                res.status(500).send(new ErrorResponse(e.original.message));
+                if (e.original.message.includes("The DELETE statement conflicted with the REFERENCE constraint"))
+                {
+                    res.status(409).send(new ErrorResponse("the base already exist item under him"));
+                }
+                else {
+                    res.status(500).send(new ErrorResponse(e.original.message));
+                }
             });
     }
 }
