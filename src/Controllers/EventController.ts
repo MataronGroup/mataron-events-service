@@ -191,7 +191,6 @@ class EventController implements Controller {
                                     StandID: stand.StandID,
                                     NetworksID: req.body.bases[i].room[k].stands[m].network[y]
 
-
                                 })
                             }
 
@@ -323,23 +322,25 @@ class EventController implements Controller {
                                     }).catch(e => {console.log(e)});
 
 
-                                    // const stand = await this.db.models.StandModel.upsert({
-                                    //     DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
-                                    //     NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
-                                    //     RoomsID: room.dataValues.RoomsID,
-                                    //     X: req.body.bases[i].room[k].stands[m].X,
-                                    //     Y: req.body.bases[i].room[k].stands[m].Y,
-                                    //     CellName: req.body.bases[i].room[k].stands[m].cellname,
+                                    if (req.body.bases[i].room[k].stands[m].network) {
+                                        for (let y = 0; y < req.body.bases[i].room[k].stands[m].network.length; y++) {
+                                            console.log(y)
+                                            console.log("networks")
+                                            console.log(req.body.bases[i].room[k].stands[m].network[y])
+                                            await this.db.models.StandsToNetworksModel.destroy({where: {
+                                                StandID: req.body.bases[i].room[k].stands[m].StandId
+                                                }})
+                                                .then(async aewr => {
+                                                    await this.db.models.StandToNetworksModel.create({
+                                                        StandID: req.body.bases[i].room[k].stands[m].StandId,
+                                                        NetworksID: req.body.bases[i].room[k].stands[m].network[y]
 
-                                    //     // StandID: standId
-                                    // })
+                                                    })
+                                                })
+                                        }
 
-                                        // .then(rp => {
-                                        //     res.send(rp);
-                                        // })
-                                        // .catch(e => {
-                                        //     res.status(500).send(e.message);
-                                        // });
+
+                                    }
 
                                 }
                             }
