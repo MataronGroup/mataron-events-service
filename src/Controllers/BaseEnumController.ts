@@ -3,9 +3,9 @@ import {Controller} from "../Common/Controller";
 import {Sequelize} from "sequelize-typescript";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
 import {validate} from "express-jsonschema";
-import arenaSchemas from "../Configuration/JsonSchemas/ArenaControllerSchemas";
+import baseEnumSchemas from "../Configuration/JsonSchemas/BaseEnumControllerSchemas";
 
-class BaseEnumController implements Controller
+export default  class BaseEnumController implements Controller
 {
     path: string;
     router: express.Router;
@@ -15,7 +15,7 @@ class BaseEnumController implements Controller
         this.db = db;
         this.path = "/baseEnum";
         this.router = express.Router();
-        this.schema = arenaSchemas.basicBody
+        this.schema = baseEnumSchemas.basicBody
         this.initializeRoutes();
     }
 
@@ -28,7 +28,7 @@ class BaseEnumController implements Controller
 
     private async getAllBasesEnum(req: express.Request, res: express.Response) {
 
-        await this.db.models.ArenaTableModel.findAll()
+        await this.db.models.BaseEnumModel.findAll()
             .then(r => {
                 res.send(r);
             })
@@ -38,15 +38,17 @@ class BaseEnumController implements Controller
     }
 
     private async createBaseEnum(req: express.Request, res: express.Response) {
-        const type = req.body.Type;
-        await this.db.models.ArenaTableModel.findOne({where : {Type : type}})
+        const type = req.body.BaseName;
+        const arenaId = req.body.ArenaID;
+        await this.db.models.BaseEnumModel.findOne({where : {BaseName : type}})
             .then(async r => {
                 if (r){
                     res.status(409).send(new ErrorResponse(`The arena with name already exist ${type}`));
                 }
                 else {
-                    await this.db.models.ArenaTableModel.create({
-                        Type : type
+                    await this.db.models.BaseEnumModel.create({
+                        BaseName : type,
+                        ArenaID : arenaId
                     }).then(responeCreate => {
                         res.send(responeCreate)
                     }).catch(errorCreate => {
@@ -63,11 +65,11 @@ class BaseEnumController implements Controller
         // tslint:disable-next-line:radix
         const id = parseInt(req.params.id);
         console.log(id)
-        await this.db.models.ArenaTableModel.findByPk(id)
+        await this.db.models.BaseEnumModel.findByPk(id)
             .then(async r => {
                 if (r){
-                    await this.db.models.ArenaTableModel.destroy({where : {
-                            Id : id,
+                    await this.db.models.BaseEnumModel.destroy({where : {
+                            ID : id,
                         }}).then(responeDelete => {
                         res.status(201).send(r)
                     }).catch(errorDelete => {
@@ -83,5 +85,3 @@ class BaseEnumController implements Controller
             })
     }
 }
-
-export default ArenaController;
