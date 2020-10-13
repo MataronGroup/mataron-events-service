@@ -138,17 +138,25 @@ class EventController implements Controller {
             Name: req.body.Name,
 
         }).then(r => r.toJSON());
-
-
         for (let i = 0; i < req.body.bases.length; i++) {
             console.log(i)
-
+            const baseId = req.body.bases[i].BaseId
+            const baseData = await this.db.models.BaseEnumModel.findOne({where : {ID : baseId}})
+                .then(async (r: any) => {
+                    const base: any = await this.db.models.BaseModel.create({
+                        Name: r.BaseName,
+                        ArenaID: req.body.ArenaId,
+                        EventId : event.EventID
+                    })
+                    return base;
+                }).catch(err => {
+                    res.status(500).send(err)
+                });
             for (let k = 0; k < req.body.bases[i].room.length; k++) {
                 console.log(k);
-
                 const room: any = await this.db.models.RoomsTableModel.create({
                     Name: req.body.bases[i].room[k].Name,
-                    BaseID: req.body.bases[i].BaseId,
+                    BaseID: baseData.BaseID,
                     EventID: event.EventID
                 }).then(r => r.toJSON());
 
