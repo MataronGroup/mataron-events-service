@@ -1,6 +1,6 @@
 import {AutoIncrement, Column, Model, PrimaryKey, Table} from "sequelize-typescript";
 
-@Table({tableName:"Templates",timestamps: false})
+@Table({tableName:"StandTemplates",timestamps: false})
 class StandTemplatesModel extends Model<StandTemplatesModel>
 {
     @PrimaryKey
