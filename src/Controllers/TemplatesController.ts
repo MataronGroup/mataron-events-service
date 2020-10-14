@@ -81,6 +81,8 @@ class TemplatesController implements Controller {
 
         }
 
+        res.send();
+
 
 
     }
