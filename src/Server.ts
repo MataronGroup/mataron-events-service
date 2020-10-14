@@ -11,6 +11,11 @@ import NetworkController from "./Controllers/NetworkController";
 import ProfessionsController from "./Controllers/ProfessionsController";
 import StatisticsController from "./Controllers/StatisticsController";
 import StandController from "./Controllers/StandsController";
+import BaseEnumController from "./Controllers/BaseEnumController";
+import StandsToNetworkController from "./Controllers/StandsToNetworkController";
+import TemplatesController from "./Controllers/TemplatesController";
+import NetworkToStandTemplatesController from "./Controllers/NetworkToStandTemplatesController";
+
 
 
 const db = DBConnection;
@@ -24,7 +29,11 @@ const app = new App(
         new EventController(db),
         new NetworkController(db),
         new StandController(db),
-        new StatisticsController(db)
+        new BaseEnumController(db),
+        new StandsToNetworkController(db),
+        new TemplatesController(db),
+        new NetworkToStandTemplatesController(db),
+        new StatisticsController(db),
     ],
     server.port
 );

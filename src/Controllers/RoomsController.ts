@@ -4,6 +4,7 @@ import {Sequelize} from "sequelize-typescript";
 import {validate} from "express-jsonschema";
 import schemas from "../Configuration/JsonSchemas/RoomsControllerSchemas";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
+import {isNullOrUndefined} from "util";
 
 
 class RoomsController implements Controller
@@ -25,7 +26,7 @@ class RoomsController implements Controller
         this.router.post(this.path, validate({body: this.schema}), this.createRoom.bind(this));
         this.router.get(`${this.path}/:id`, this.getRoom.bind(this));
         this.router.get(`${this.path}`, this.getAllRooms.bind(this));
-        this.router.get(`${this.path}/event/:id`, this.getRoomByEvent.bind(this));
+        this.router.get(`${this.path}/event/:id/base/:baseId`, this.getRoomByEvent.bind(this));
 
         this.router.put(`${this.path}/:id`,validate({body: this.schema}), this.updateRoom.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteRoom.bind(this));
@@ -76,7 +77,7 @@ class RoomsController implements Controller
     }
 
     private async getRoomByEvent(req: express.Request, res: express.Response) {
-        await this.db.models.RoomsTableModel.findAll({where: {EventID: req.params.id}})
+        await this.db.models.RoomsTableModel.findAll({where: {EventID: req.params.id,BaseId : req.params.baseId}})
             .then(r => {
                 if(r) {
                     res.send(r);
@@ -132,7 +133,17 @@ class RoomsController implements Controller
                 }
             })
             .catch(e => {
-                res.status(500).send(new ErrorResponse("error"));
+                if (!isNullOrUndefined(e.original)){
+                    if (e.original.message.includes("DELETE statement conflicted with the REFERENCE constraint")){
+                        res.status(409).send(new ErrorResponse(`cannot delete room beacuse The room contain items`));
+                    }
+                    else{
+                        res.status(500).send(new ErrorResponse(e));
+                    }
+                }
+                else {
+                    res.status(500).send(new ErrorResponse(e));
+                }
             });
     }
 }

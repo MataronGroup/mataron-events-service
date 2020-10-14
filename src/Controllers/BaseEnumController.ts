@@ -3,30 +3,32 @@ import {Controller} from "../Common/Controller";
 import {Sequelize} from "sequelize-typescript";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
 import {validate} from "express-jsonschema";
-import jobSchemas from "../Configuration/JsonSchemas/JobControllerSchemas";
+import baseEnumSchemas from "../Configuration/JsonSchemas/BaseEnumControllerSchemas";
 
-class JobsController implements Controller {
+export default  class BaseEnumController implements Controller
+{
     path: string;
     router: express.Router;
     db: Sequelize;
-    schema: object;
-
+    schema : object
     constructor(db: Sequelize) {
         this.db = db;
-        this.path = "/jobs";
+        this.path = "/baseEnum";
         this.router = express.Router();
-        this.schema = jobSchemas.basicBody
+        this.schema = baseEnumSchemas.basicBody
         this.initializeRoutes();
     }
 
     private initializeRoutes() {
-        this.router.get(`${this.path}`, this.getJobs.bind(this));
-        this.router.post(`${this.path}`,validate({body: this.schema}), this.createJobs.bind(this));
-        this.router.delete(`${this.path}/:id`, this.deleteJobs.bind(this));
+        this.router.get(`${this.path}`, this.getAllBasesEnum.bind(this));
+        this.router.post(`${this.path}`,validate({body: this.schema}), this.createBaseEnum.bind(this));
+        this.router.delete(`${this.path}/:id`, this.deleteBaseEnum.bind(this));
+
     }
 
-    private async getJobs(req: express.Request, res: express.Response) {
-        await this.db.models.JobsTableModel.findAll()
+    private async getAllBasesEnum(req: express.Request, res: express.Response) {
+
+        await this.db.models.BaseEnumModel.findAll()
             .then(r => {
                 res.send(r);
             })
@@ -35,16 +37,18 @@ class JobsController implements Controller {
             })
     }
 
-    private async createJobs(req: express.Request, res: express.Response) {
-        const type = req.body.Type;
-        await this.db.models.JobsTableModel.findOne({where : {Type : type}})
+    private async createBaseEnum(req: express.Request, res: express.Response) {
+        const type = req.body.BaseName;
+        const arenaId = req.body.ArenaID;
+        await this.db.models.BaseEnumModel.findOne({where : {BaseName : type}})
             .then(async r => {
                 if (r){
-                    res.status(409).send(new ErrorResponse(`The job with name already exist ${type}`));
+                    res.status(409).send(new ErrorResponse(`The arena with name already exist ${type}`));
                 }
                 else {
-                    await this.db.models.JobsTableModel.create({
-                        Type : type
+                    await this.db.models.BaseEnumModel.create({
+                        BaseName : type,
+                        ArenaID : arenaId
                     }).then(responeCreate => {
                         res.send(responeCreate)
                     }).catch(errorCreate => {
@@ -57,23 +61,23 @@ class JobsController implements Controller {
             })
     }
 
-    private async deleteJobs(req: express.Request, res: express.Response) {
+    private async deleteBaseEnum(req: express.Request, res: express.Response) {
         // tslint:disable-next-line:radix
         const id = parseInt(req.params.id);
         console.log(id)
-        await this.db.models.JobsTableModel.findByPk(id)
+        await this.db.models.BaseEnumModel.findByPk(id)
             .then(async r => {
                 if (r){
-                    await this.db.models.JobsTableModel.destroy({where : {
-                        ID : id,
+                    await this.db.models.BaseEnumModel.destroy({where : {
+                            ID : id,
                         }}).then(responeDelete => {
-                            res.status(201).send(r)
+                        res.status(201).send(r)
                     }).catch(errorDelete => {
                         res.status(500).send(new ErrorResponse(errorDelete));
                     })
                 }
                 else {
-                    res.status(404).send(new ErrorResponse(`The job with id already exist ${id}`));
+                    res.status(404).send(new ErrorResponse(`The arena with id already exist ${id}`));
                 }
             })
             .catch(e => {
@@ -81,5 +85,3 @@ class JobsController implements Controller {
             })
     }
 }
-
-export default JobsController;

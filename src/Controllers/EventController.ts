@@ -2,7 +2,10 @@ import express from "express";
 import { Sequelize } from "sequelize-typescript";
 import { Controller } from "../Common/Controller";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
-import {validate} from "express-jsonschema";
+import { validate } from "express-jsonschema";
+import StandModel from "../Models/Database/StandModel";
+import StandToNetworksModel from "../Models/Database/StandToNetworksModel";
+import {isNullOrUndefined} from "util";
 class EventController implements Controller {
 
     path: string;
@@ -28,8 +31,8 @@ class EventController implements Controller {
                     type: 'number',
                     required: true
                 },
-                Name:{
-                    type:'string',
+                Name: {
+                    type: 'string',
                     required: true
                 },
                 bases: {
@@ -37,7 +40,7 @@ class EventController implements Controller {
                     items: {
                         type: 'Object',
                         properties: {
-                            BaseId : {
+                            BaseId: {
                                 type: 'number',
                                 required: true
                             },
@@ -47,6 +50,10 @@ class EventController implements Controller {
                                 items: {
                                     type: 'Object',
                                     properties: {
+                                        RoomId: {
+                                            type: 'number',
+                                            required: false
+                                        },
                                         Name: {
                                             type: 'string',
                                             required: true
@@ -56,42 +63,46 @@ class EventController implements Controller {
                                             items: {
                                                 type: 'Object',
                                                 properties: {
-                                                    X:{
+                                                    StandId: {
+                                                        type: 'string',
+                                                        required: false
+                                                    },
+                                                    X: {
                                                         type: 'number',
                                                         required: true
                                                     },
-                                                    Y:{
+                                                    Y: {
                                                         type: 'number',
                                                         required: true
                                                     },
-                                                    cellname:{
+                                                    cellname: {
                                                         type: 'string',
                                                         required: false
                                                     },
                                                     soldiers: {
                                                         type: 'array',
-                                                        items:{
+                                                        items: {
                                                             type: 'Object',
                                                             properties: {
-                                                                DaySoldier:{
+                                                                DaySoldier: {
                                                                     type: 'string',
                                                                     required: false
                                                                 },
-                                                                NightSoldier:{
+                                                                NightSoldier: {
                                                                     type: 'string',
                                                                     required: false
                                                                 },
-                                                    network:{
-                                                        type:'array',
-                                                        items:{
-                                                            type:'object',
-                                                            properties:{
+                                                                network: {
+                                                                    type: 'array',
+                                                                    items: {
+                                                                        type: 'object',
+                                                                        properties: {
 
-                                                            },
-                                                            required: false
+                                                                        },
+                                                                        required: false
 
-                                                        }
-                                                    }
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -115,11 +126,11 @@ class EventController implements Controller {
     }
 
     private initializeRoutes() {
-        this.router.post(this.path,validate({body: this.schema}), this.createEvent.bind(this));
+        this.router.post(this.path, validate({ body: this.schema }), this.createEvent.bind(this));
         this.router.get(`${this.path}/:id`, this.getEvent.bind(this));
         this.router.get(`${this.path}`, this.getEvents.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteEvent.bind(this));
-        this.router.put(`${this.path}/:id`, validate({body: this.schema}),this.updateEvent.bind(this));
+        this.router.put(`${this.path}/:id`,  this.updateEvent.bind(this));
 
     }
 
@@ -129,26 +140,27 @@ class EventController implements Controller {
             Name: req.body.Name,
 
         }).then(r => r.toJSON());
-
-
         for (let i = 0; i < req.body.bases.length; i++) {
             console.log(i)
-
+            const baseId = req.body.bases[i].BaseId
+            const baseData = await this.db.models.BaseEnumModel.findOne({where : {ID : baseId}})
+                .then(async (r: any) => {
+                    const base: any = await this.db.models.BaseModel.create({
+                        Name: r.BaseName,
+                        ArenaID: req.body.ArenaId,
+                        EventId : event.EventID
+                    })
+                    return base;
+                }).catch(err => {
+                    res.status(500).send(err)
+                });
             for (let k = 0; k < req.body.bases[i].room.length; k++) {
                 console.log(k);
-
                 const room: any = await this.db.models.RoomsTableModel.create({
                     Name: req.body.bases[i].room[k].Name,
-                    BaseID: req.body.bases[i].BaseId,
+                    BaseID: baseData.BaseID,
                     EventID: event.EventID
                 }).then(r => r.toJSON());
-
-                await this.db.models.BaseToEventModel.create({
-                    BaseID: req.body.bases[i].BaseId,
-                    EventID: event.EventID
-                })
-
-
 
                 for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
                     console.log(m)
@@ -159,36 +171,39 @@ class EventController implements Controller {
                         console.log("stands:");
                         console.log(req.body.bases[i].room[k].stands[m].soldiers[n]);
 
-                        const stand : any= await this.db.models.StandModel.create({
+                        const stand: any = await this.db.models.StandModel.create({
                             id: req.body.bases[i].room[k].stands[m].id,
                             DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
                             NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
                             RoomsID: room.RoomsID,
                             X: req.body.bases[i].room[k].stands[m].X,
                             Y: req.body.bases[i].room[k].stands[m].Y,
-                            CellName: req.body.bases[i].room[k].stands[m].cellname
+                            CellName: req.body.bases[i].room[k].stands[m].cellname,
+                            BluePhone: req.body.bases[i].room[k].stands[m].blue,
+                            Bezek: req.body.bases[i].room[k].stands[m].bezek,
+                            Voip: req.body.bases[i].room[k].stands[m].voip,
+                            RedPhone: req.body.bases[i].room[k].stands[m].red,
+                            JobType: req.body.bases[i].room[k].stands[m].job,
 
 
-
-                        }).then(g=>g.toJSON());
-                        if(req.body.bases[i].room[k].stands[m].network)
-                        {
-                        for(let y=0; y<req.body.bases[i].room[k].stands[m].network.length; y++) {
-                            console.log(y)
-                            console.log(stand.StandID)
-                            console.log(req.body.bases[i].room[k].stands[m].network[y])
+                        }).then(g => g.toJSON());
+                        if (req.body.bases[i].room[k].stands[m].network) {
+                            for (let y = 0; y < req.body.bases[i].room[k].stands[m].network.length; y++) {
+                                console.log(y)
+                                console.log(stand.StandID)
+                                console.log(req.body.bases[i].room[k].stands[m].network[y])
 
 
-                            await this.db.models.StandToNetworksModel.create({
-                                StandID: stand.StandID,
-                                NetworksID: req.body.bases[i].room[k].stands[m].network[y]
+                                await this.db.models.StandToNetworksModel.create({
+                                    StandID: stand.StandID,
+                                    NetworksID: req.body.bases[i].room[k].stands[m].network[y]
 
 
-                            })
+                                })
+                            }
+
+
                         }
-
-
-                    }
 
 
                     }
@@ -245,12 +260,24 @@ class EventController implements Controller {
                 }
             })
             .catch(e => {
-                res.status(500).send(new ErrorResponse("error"));
+                console.log(e)
+                if (!isNullOrUndefined(e.original)){
+                    if (e.original.message.includes("DELETE statement conflicted with the REFERENCE constraint")){
+                        res.status(409).send(new ErrorResponse(`cannot delete event beacuse The room contain items`));
+                    }
+                    else{
+                        res.status(500).send(new ErrorResponse(e));
+                    }
+                }
+                else {
+                    res.status(500).send(new ErrorResponse(e));
+                }
             });
 
 
 
     }
+
     private async updateEvent(req: express.Request, res: express.Response) {
         console.log(this.db.models)
 
@@ -260,50 +287,94 @@ class EventController implements Controller {
                     const event: any = await this.db.models.EventsModel.update({
                         Name: req.body.Name
                     }, { where: { EventID: req.params.id } })
-
                     for (let i = 0; i < req.body.bases.length; i++) {
                         console.log(i)
-
                         for (let k = 0; k < req.body.bases[i].room.length; k++) {
                             console.log(k);
-
+                            const roomId = req.body.bases[i].room[k].RoomId
                             const room: any = await this.db.models.RoomsTableModel.update({
                                 Name: req.body.bases[i].room[k].Name,
                                 BaseID: req.body.bases[i].BaseId
                             },
                                 {
-                                    where: { EventID: req.params.id },
-                                    returning:true
+                                    where: { EventID: req.params.id, RoomsID: roomId },
+                                    returning: true
                                 })
-                                .then((rrr : any) => rrr[1][0])
+                                .then((rrr: any) => rrr[1][0])
                                 .catch(err => console.log(err))
-
-                                console.log(room)
+                            console.log(room)
 
                             for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
                                 console.log(m)
-
-
                                 for (let n = 0; n < req.body.bases[i].room[k].stands[m].soldiers.length; n++) {
                                     console.log(n)
+                                    // tslint:disable-next-line:radix
+                                    const standId = req.body.bases[i].room[k].stands[m].StandId
 
+                                    console.log("standid")
+                                    console.log(standId)
+                                    this.db.models.StandModel.findByPk(standId).then(t => {
+                                        if (t) { console.log("blabla")
+                                            this.db.models.StandModel.update({
+                                                DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
+                                                NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
+                                                RoomsID: room.dataValues.RoomsID,
+                                                X: req.body.bases[i].room[k].stands[m].X,
+                                                Y: req.body.bases[i].room[k].stands[m].Y,
+                                                CellName: req.body.bases[i].room[k].stands[m].cellname
+                                            }, { where: { StandID: standId }})
+                                        }
+                                        else{console.log("bewskj")
+                                        this.db.models.StandModel.create({
+                                            DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
+                                            NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
+                                            RoomsID: room.dataValues.RoomsID,
+                                            X: req.body.bases[i].room[k].stands[m].X,
+                                            Y: req.body.bases[i].room[k].stands[m].Y,
+                                            CellName: req.body.bases[i].room[k].stands[m].cellname,
+                                            BluePhone: req.body.bases[i].room[k].stands[m].blue,
+                                            Bezek: req.body.bases[i].room[k].stands[m].bezek,
+                                            Voip: req.body.bases[i].room[k].stands[m].voip,
+                                            RedPhone: req.body.bases[i].room[k].stands[m].red,
+                                            JobType: req.body.bases[i].room[k].stands[m].job})}
+                                    }).catch(e => {console.log(e)});
 
-                                    const stand = await this.db.models.StandModel.update({
-                                        DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
-                                        NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
-                                        RoomsID: room.dataValues.RoomsID,
-                                        X: req.body.bases[i].room[k].stands[m].x,
-                                        Y: req.body.bases[i].room[k].stands[m].y,
-                                        CellName: req.body.bases[i].room[k].stands[m].cellname
+                                    if (req.body.bases[i].room[k].stands[m].network) {
+                                        for (let y = 0; y < req.body.bases[i].room[k].stands[m].network.length; y++) {
+                                            console.log(y)
+                                            console.log("networks")
+                                            console.log(req.body.bases[i].room[k].stands[m].network[y])
+                                            await this.db.models.StandToNetworksModel.destroy({
+                                                where: {
+                                                    StandID: req.body.bases[i].room[k].stands[m].StandId
+                                                }
+                                            })
+                                                .then(async aewr => {
+                                                    await this.db.models.StandToNetworksModel.create({
+                                                        StandID: req.body.bases[i].room[k].stands[m].StandId,
+                                                        NetworksID: req.body.bases[i].room[k].stands[m].network[y]
+                                                    });
+                                                });
+                                        }
+                                    }
 
-                                    }, { where: {RoomsID:room.dataValues.RoomsID} })
+                                    // const stand = await this.db.models.StandModel.upsert({
+                                    //     DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
+                                    //     NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
+                                    //     RoomsID: room.dataValues.RoomsID,
+                                    //     X: req.body.bases[i].room[k].stands[m].X,
+                                    //     Y: req.body.bases[i].room[k].stands[m].Y,
+                                    //     CellName: req.body.bases[i].room[k].stands[m].cellname,
 
-                                        .then(rp => {
-                                            res.send(rp);
-                                        })
-                                        .catch(e => {
-                                            res.status(500).send(e.message);
-                                        });
+                                    //     // StandID: standId
+                                    // })
+
+                                        // .then(rp => {
+                                        //     res.send(rp);
+                                        // })
+                                        // .catch(e => {
+                                        //     res.status(500).send(e.message);
+                                        // });
 
                                 }
                             }
@@ -311,11 +382,15 @@ class EventController implements Controller {
                     }
                 }
                 else {
-                    res.status(404).send(new ErrorResponse(`cannot find room id ${req.params.id}`));
+                    console.log("not found")
+                    res.status(404).send(new ErrorResponse(`cannot find  ${req.params.id}`));
                 }
+            }).catch(err => {
+                console.log("err--" + err)
+                console.log(err)
+                res.status(500).send({ "error": err })
             })
-
-        res.send("ok");
+        res.status(200).json({ "status": "success" });
 
     }
 
