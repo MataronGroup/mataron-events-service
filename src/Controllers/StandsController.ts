@@ -17,10 +17,22 @@ class StandController implements Controller {
     }
 
     private initializeRoutes() {
+        this.router.get(`${this.path}/:id`, this.getStand.bind(this));
         this.router.get(`${this.path}/room/:id`, this.getAllStandsByRoom.bind(this));
         this.router.put(`${this.path}/:id`, this.editStand.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteStand.bind(this));
     }
+
+    private async getStand(req: express.Request, res: express.Response) {
+        await this.db.models.StandModel.findByPk(req.params.id).then(async r => {
+            if (r) {
+               res.send(r);
+            } else {
+                res.send(new ErrorResponse(`not found stand id ${req.params.id}`))
+            }
+        });
+    }
+
 
     private async editStand(req: express.Request, res: express.Response) {
         await this.db.models.StandModel.findByPk(req.params.id).then(async r => {

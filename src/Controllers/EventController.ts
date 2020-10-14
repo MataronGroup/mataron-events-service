@@ -126,11 +126,11 @@ class EventController implements Controller {
     }
 
     private initializeRoutes() {
-        this.router.post(this.path, this.createEvent.bind(this));
+        this.router.post(this.path, validate({ body: this.schema }), this.createEvent.bind(this));
         this.router.get(`${this.path}/:id`, this.getEvent.bind(this));
         this.router.get(`${this.path}`, this.getEvents.bind(this));
         this.router.delete(`${this.path}/:id`, this.deleteEvent.bind(this));
-        this.router.put(`${this.path}/:id`, validate({ body: this.schema }), this.updateEvent.bind(this));
+        this.router.put(`${this.path}/:id`,  this.updateEvent.bind(this));
 
     }
 
@@ -178,8 +178,12 @@ class EventController implements Controller {
                             RoomsID: room.RoomsID,
                             X: req.body.bases[i].room[k].stands[m].X,
                             Y: req.body.bases[i].room[k].stands[m].Y,
-                            CellName: req.body.bases[i].room[k].stands[m].cellname
-
+                            CellName: req.body.bases[i].room[k].stands[m].cellname,
+                            BluePhone: req.body.bases[i].room[k].stands[m].blue,
+                            Bezek: req.body.bases[i].room[k].stands[m].bezek,
+                            Voip: req.body.bases[i].room[k].stands[m].voip,
+                            RedPhone: req.body.bases[i].room[k].stands[m].red,
+                            JobType: req.body.bases[i].room[k].stands[m].job,
 
 
                         }).then(g => g.toJSON());
@@ -193,6 +197,7 @@ class EventController implements Controller {
                                 await this.db.models.StandToNetworksModel.create({
                                     StandID: stand.StandID,
                                     NetworksID: req.body.bases[i].room[k].stands[m].network[y]
+
 
                                 })
                             }
@@ -326,7 +331,12 @@ class EventController implements Controller {
                                             RoomsID: room.dataValues.RoomsID,
                                             X: req.body.bases[i].room[k].stands[m].X,
                                             Y: req.body.bases[i].room[k].stands[m].Y,
-                                            CellName: req.body.bases[i].room[k].stands[m].cellname})}
+                                            CellName: req.body.bases[i].room[k].stands[m].cellname,
+                                            BluePhone: req.body.bases[i].room[k].stands[m].blue,
+                                            Bezek: req.body.bases[i].room[k].stands[m].bezek,
+                                            Voip: req.body.bases[i].room[k].stands[m].voip,
+                                            RedPhone: req.body.bases[i].room[k].stands[m].red,
+                                            JobType: req.body.bases[i].room[k].stands[m].job})}
                                     }).catch(e => {console.log(e)});
 
                                     if (req.body.bases[i].room[k].stands[m].network) {
@@ -334,20 +344,37 @@ class EventController implements Controller {
                                             console.log(y)
                                             console.log("networks")
                                             console.log(req.body.bases[i].room[k].stands[m].network[y])
-                                            await this.db.models.StandToNetworksModel.destroy({where: {
-                                                StandID: req.body.bases[i].room[k].stands[m].StandId
-                                                }})
+                                            await this.db.models.StandToNetworksModel.destroy({
+                                                where: {
+                                                    StandID: req.body.bases[i].room[k].stands[m].StandId
+                                                }
+                                            })
                                                 .then(async aewr => {
                                                     await this.db.models.StandToNetworksModel.create({
                                                         StandID: req.body.bases[i].room[k].stands[m].StandId,
                                                         NetworksID: req.body.bases[i].room[k].stands[m].network[y]
-
-                                                    })
-                                                })
+                                                    });
+                                                });
                                         }
-
-
                                     }
+
+                                    // const stand = await this.db.models.StandModel.upsert({
+                                    //     DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
+                                    //     NightUserID: req.body.bases[i].room[k].stands[m].soldiers[n].NightSoldier,
+                                    //     RoomsID: room.dataValues.RoomsID,
+                                    //     X: req.body.bases[i].room[k].stands[m].X,
+                                    //     Y: req.body.bases[i].room[k].stands[m].Y,
+                                    //     CellName: req.body.bases[i].room[k].stands[m].cellname,
+
+                                    //     // StandID: standId
+                                    // })
+
+                                        // .then(rp => {
+                                        //     res.send(rp);
+                                        // })
+                                        // .catch(e => {
+                                        //     res.status(500).send(e.message);
+                                        // });
 
                                 }
                             }
