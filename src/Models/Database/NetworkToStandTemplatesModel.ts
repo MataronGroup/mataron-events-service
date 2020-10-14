@@ -3,7 +3,7 @@ import {AutoIncrement, Column, Model, PrimaryKey, Table} from "sequelize-typescr
 @Table({tableName:"NetworkToStandTemplates",timestamps: false})
 class NetworkToStandTemplatesModel extends Model<NetworkToStandTemplatesModel>
 {
-   
+
     @Column
     StandID: number;
 

@@ -344,13 +344,19 @@ class EventController implements Controller {
                                             console.log(y)
                                             console.log("networks")
                                             console.log(req.body.bases[i].room[k].stands[m].network[y])
-                                            await this.db.models.StandToNetworksModel.destroy({where: {
-                                                StandID: req.body.bases[i].room[k].stands[m].StandId
-                                                }})
+                                            await this.db.models.StandToNetworksModel.destroy({
+                                                where: {
+                                                    StandID: req.body.bases[i].room[k].stands[m].StandId
+                                                }
+                                            })
                                                 .then(async aewr => {
                                                     await this.db.models.StandToNetworksModel.create({
                                                         StandID: req.body.bases[i].room[k].stands[m].StandId,
                                                         NetworksID: req.body.bases[i].room[k].stands[m].network[y]
+                                                    });
+                                                });
+                                        }
+                                    }
 
                                     // const stand = await this.db.models.StandModel.upsert({
                                     //     DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,

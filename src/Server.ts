@@ -13,6 +13,7 @@ import StatisticsController from "./Controllers/StatisticsController";
 import StandController from "./Controllers/StandsController";
 import BaseEnumController from "./Controllers/BaseEnumController";
 import StandsToNetworkController from "./Controllers/StandsToNetworkController";
+import TemplatesController from "./Controllers/TemplatesController";
 
 
 
@@ -29,6 +30,7 @@ const app = new App(
         new StandController(db),
         new BaseEnumController(db),
         new StandsToNetworkController(db),
+        new TemplatesController(db),
         new StatisticsController(db),
     ],
     server.port

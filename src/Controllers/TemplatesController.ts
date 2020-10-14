@@ -62,7 +62,7 @@ class TemplatesController implements Controller {
     }
     private async createTemplate(req: express.Request, res: express.Response) {
         const template: any = await this.db.models.TemplatesModel.create({
-            Name: req.body.name }).then (p=> p.toJSON());
+            Name: req.body.Name }).then (p=> p.toJSON());
 
         for (let o= 0; o< req.body.stands.length; o++)
         {
@@ -85,11 +85,11 @@ class TemplatesController implements Controller {
                     NetworkID: req.body.stands[o].network[u]
                 })
             }
-            
+
         }
 
-        
-           
+
+
     }
 }
 
