@@ -4,6 +4,8 @@ import { Controller } from "../Common/Controller";
 import ErrorResponse from "../Models/Api/Responses/ErrorResponse";
 import { validate } from "express-jsonschema";
 import StandModel from "../Models/Database/StandModel";
+import StandToNetworksModel from "../Models/Database/StandToNetworksModel";
+import {isNullOrUndefined} from "util";
 class EventController implements Controller {
 
     path: string;
@@ -160,13 +162,6 @@ class EventController implements Controller {
                     EventID: event.EventID
                 }).then(r => r.toJSON());
 
-                await this.db.models.BaseToEventModel.create({
-                    BaseID: req.body.bases[i].BaseId,
-                    EventID: event.EventID
-                })
-
-
-
                 for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
                     console.log(m)
 
@@ -265,7 +260,18 @@ class EventController implements Controller {
                 }
             })
             .catch(e => {
-                res.status(500).send(new ErrorResponse("error"));
+                console.log(e)
+                if (!isNullOrUndefined(e.original)){
+                    if (e.original.message.includes("DELETE statement conflicted with the REFERENCE constraint")){
+                        res.status(409).send(new ErrorResponse(`cannot delete event beacuse The room contain items`));
+                    }
+                    else{
+                        res.status(500).send(new ErrorResponse(e));
+                    }
+                }
+                else {
+                    res.status(500).send(new ErrorResponse(e));
+                }
             });
 
 
@@ -281,10 +287,8 @@ class EventController implements Controller {
                     const event: any = await this.db.models.EventsModel.update({
                         Name: req.body.Name
                     }, { where: { EventID: req.params.id } })
-
                     for (let i = 0; i < req.body.bases.length; i++) {
                         console.log(i)
-
                         for (let k = 0; k < req.body.bases[i].room.length; k++) {
                             console.log(k);
                             const roomId = req.body.bases[i].room[k].RoomId
@@ -298,16 +302,12 @@ class EventController implements Controller {
                                 })
                                 .then((rrr: any) => rrr[1][0])
                                 .catch(err => console.log(err))
-
                             console.log(room)
 
                             for (let m = 0; m < req.body.bases[i].room[k].stands.length; m++) {
                                 console.log(m)
-
-
                                 for (let n = 0; n < req.body.bases[i].room[k].stands[m].soldiers.length; n++) {
                                     console.log(n)
-
                                     // tslint:disable-next-line:radix
                                     const standId = req.body.bases[i].room[k].stands[m].StandId
 
@@ -339,6 +339,18 @@ class EventController implements Controller {
                                             JobType: req.body.bases[i].room[k].stands[m].job})}
                                     }).catch(e => {console.log(e)});
 
+                                    if (req.body.bases[i].room[k].stands[m].network) {
+                                        for (let y = 0; y < req.body.bases[i].room[k].stands[m].network.length; y++) {
+                                            console.log(y)
+                                            console.log("networks")
+                                            console.log(req.body.bases[i].room[k].stands[m].network[y])
+                                            await this.db.models.StandToNetworksModel.destroy({where: {
+                                                StandID: req.body.bases[i].room[k].stands[m].StandId
+                                                }})
+                                                .then(async aewr => {
+                                                    await this.db.models.StandToNetworksModel.create({
+                                                        StandID: req.body.bases[i].room[k].stands[m].StandId,
+                                                        NetworksID: req.body.bases[i].room[k].stands[m].network[y]
 
                                     // const stand = await this.db.models.StandModel.upsert({
                                     //     DayUserID: req.body.bases[i].room[k].stands[m].soldiers[n].DaySoldier,
@@ -364,9 +376,12 @@ class EventController implements Controller {
                     }
                 }
                 else {
+                    console.log("not found")
                     res.status(404).send(new ErrorResponse(`cannot find  ${req.params.id}`));
                 }
             }).catch(err => {
+                console.log("err--" + err)
+                console.log(err)
                 res.status(500).send({ "error": err })
             })
         res.status(200).json({ "status": "success" });
